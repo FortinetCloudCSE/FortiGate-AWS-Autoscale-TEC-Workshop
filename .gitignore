@@ -1,0 +1,8 @@
+**/.DS_Store
+public/
+docs/
+node_modules/
+docker-compose.yml
+package-lock.json
+package.json
+/venv
