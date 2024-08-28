@@ -1,7 +1,7 @@
 {
-  "repoName":"UserRepo",
-  "author":"Jeff Kopko",
-  "workshopTitle":"Hugo for Fortinet TECWorkshops",
+  "repoName":"FortiGate-AWS-Autoscale-TEC-Workshop",
+  "author":"Mike Wooten",
+  "workshopTitle":"FortiGate AWS Autoscale TEC Workshop",
   "themeVariant":"Workshop",
   "logoBannerText":"",
   "logoBannerSubText":"",
