@@ -141,7 +141,7 @@ module "inspection_instance_jump_box" {
   instance_type               = var.linux_instance_type
   security_group_public_id    = aws_security_group.ec2-linux-jump-box-sg[0].id
   acl                         = var.acl
-  iam_instance_profile_id     = module.iam_profile[0].id
+  iam_instance_profile_id     = module.linux_iam_profile[0].id
   userdata_rendered           = data.template_file.web_userdata_az1[0].rendered
 }
 
