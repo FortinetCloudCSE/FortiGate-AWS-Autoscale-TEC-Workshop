@@ -22,6 +22,10 @@ variable "private_subnet_index" {
   description = "Index of the private subnet"
   default = 2
 }
+variable "tgw_subnet_index" {
+  description = "Index of the Transit Gateway Attachment subnet"
+  default = 3
+}
 variable "enable_jump_box" {
   description = "Boolean to allow creation of Linux Jump Box in Inspection VPC"
   type        = bool
@@ -37,6 +41,19 @@ variable "enable_fortianalyzer" {
 variable "enable_nat_gateway" {
   description = "Boolean to allow creation of nat gateways in each AZ of Inspection VPC"
   type        = bool
+}
+variable "enable_tgw_attachment_subnet" {
+  description = "Boolean to allow creation of TGW Attachment subnet in each AZ of Inspection VPC"
+  type        = bool
+}
+variable "enable_tgw_attachment" {
+  description = "Allow Inspection VPC to attach to an existing TGW"
+  type        = bool
+}
+variable "attach_to_tgw_name" {
+  description = "Name of the TGW to attach to"
+  type        = string
+  default     = ""
 }
 variable "enable_jump_box_public_ip" {
   description = "Boolean to allow creation of Linux Jump Box public IP in Inspection VPC"

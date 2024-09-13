@@ -11,15 +11,15 @@ locals {
 
 resource "null_resource" "previous" {}
 
-resource "time_sleep" "wait_5_minutes" {
+resource "time_sleep" "wait_1_minutes" {
   depends_on = [ module.inspection_instance_jump_box ]
 
-  create_duration = "5m"
+  create_duration = "1m"
 }
 
 # This resource will create (at least) 30 seconds after null_resource.previous
 resource "null_resource" "next" {
-  depends_on = [time_sleep.wait_5_minutes]
+  depends_on = [time_sleep.wait_1_minutes]
 }
 
 #
@@ -149,11 +149,10 @@ module "inspection_instance_jump_box" {
 # Fortimanager
 #
 data "template_file" "fmgr_userdata" {
-  count       = var.enable_fortimanager ? 1 : 0
   template = file("./config_templates/fmgr-userdata.tpl")
 
   vars = {
-    fmgr_byol_license      = file("./licenses/fmgr-license.lic")
+    fmgr_byol_license      = var.enable_fortimanager ? ("./licenses/fmgr-license.lic") : ""
   }
 }
 
@@ -161,11 +160,9 @@ data "template_file" "fmgr_userdata" {
 # Fortianalyzer
 #
 data "template_file" "faz_userdata" {
-  count       = var.enable_fortianalyzer ? 1 : 0
   template = file("./config_templates/faz-userdata.tpl")
-
   vars = {
-    faz_byol_license      = file("./licenses/faz-license.lic")
+    faz_byol_license      = var.enable_fortianalyzer ? ("./licenses/faz-license.lic") : ""
   }
 }
 
@@ -281,7 +278,7 @@ module "fortimanager" {
   keypair                     = var.keypair
   security_group_public_id    = aws_security_group.fortimanager_sg[0].id
   iam_instance_profile_id     = module.iam_profile[0].id
-  userdata_rendered           = data.template_file.fmgr_userdata[0].rendered
+  userdata_rendered           = var.enable_fortimanager ? data.template_file.fmgr_userdata.rendered : ""
 }
 
 resource aws_security_group "fortianalyzer_sg" {
@@ -349,5 +346,5 @@ module "fortianalyzer" {
   keypair                     = var.keypair
   security_group_public_id    = aws_security_group.fortianalyzer_sg[0].id
   iam_instance_profile_id     = module.iam_profile[0].id
-  userdata_rendered           = data.template_file.faz_userdata[0].rendered
+  userdata_rendered           = var.enable_fortianalyzer ? data.template_file.faz_userdata.rendered : ""
 }
