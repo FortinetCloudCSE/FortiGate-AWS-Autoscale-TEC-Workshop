@@ -6,3 +6,27 @@ docker-compose.yml
 package-lock.json
 package.json
 /venv
+# Created by .ignore support plugin (hsz.mobi)
+**/.DS_Store
+*~
+**/.idea
+**/__pycache__
+**/*.pyc
+**/.terraform.lock.hcl
+**/*.lic
+**/*.zip
+**/.terraform.tfstate.lock.info
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/venv
+**/site-packages
+\#*#
+*.swp
+*.pyc
+*.lic
+debug.log
+.repo_conf/*.retry
+**/.idea
+**/.terraform
+**/__pycache__
+ncc-service-account.json
