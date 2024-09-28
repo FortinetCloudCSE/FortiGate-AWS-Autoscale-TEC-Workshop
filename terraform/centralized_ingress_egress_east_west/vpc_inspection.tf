@@ -26,10 +26,10 @@ locals {
   public_subnet_cidr_az2 = cidrsubnet(var.vpc_cidr_inspection, var.subnet_bits, var.public_subnet_index + 3)
 }
 locals {
-  fwaas_subnet_cidr_az1 = cidrsubnet(var.vpc_cidr_inspection, var.subnet_bits, var.fwaas_subnet_index)
+  gwlbe_subnet_cidr_az1 = cidrsubnet(var.vpc_cidr_inspection, var.subnet_bits, var.gwlbe_subnet_index)
 }
 locals {
-  fwaas_subnet_cidr_az2 = cidrsubnet(var.vpc_cidr_inspection, var.subnet_bits, var.fwaas_subnet_index + 3)
+  gwlbe_subnet_cidr_az2 = cidrsubnet(var.vpc_cidr_inspection, var.subnet_bits, var.gwlbe_subnet_index + 3)
 }
 locals {
   private_subnet_cidr_az1 = cidrsubnet(var.vpc_cidr_inspection, var.subnet_bits, var.private_subnet_index)
@@ -114,19 +114,19 @@ resource aws_ec2_tag "subnet_public_tag_az1" {
   value = "Public-Az1"
 }
 
-module "subnet-inspection-fwaas-az1" {
+module "subnet-inspection-gwlbe-az1" {
   source = "git::https://github.com/40netse/terraform-modules.git//aws_subnet"
-  subnet_name                = "${var.cp}-${var.env}-inspection-fwaas-az1-subnet"
+  subnet_name                = "${var.cp}-${var.env}-inspection-gwlbe-az1-subnet"
 
   vpc_id                     = module.vpc-inspection.vpc_id
   availability_zone          = local.availability_zone_1
-  subnet_cidr                = local.fwaas_subnet_cidr_az1
+  subnet_cidr                = local.gwlbe_subnet_cidr_az1
 }
 
-resource aws_ec2_tag "subnet_fwaas_tag_az1" {
-  resource_id = module.subnet-inspection-fwaas-az1.id
+resource aws_ec2_tag "subnet_gwlbe_tag_az1" {
+  resource_id = module.subnet-inspection-gwlbe-az1.id
   key = "Workshop-area"
-  value = "Fwaas-Az1"
+  value = "gwlbe-Az1"
 }
 
 module "subnet-inspection-private-az1" {
@@ -154,18 +154,18 @@ module "inspection-private-route-table-association-az1" {
   subnet_ids                 = module.subnet-inspection-private-az1.id
   route_table_id             = module.inspection-private-route-table-az1.id
 }
-module "inspection-fwaas-route-table-az1" {
-  source  = "git::https://github.com/40netse/terraform-modules.git//aws_route_table"
-  rt_name = "${var.cp}-${var.env}-inspection-fwaas-rt-az1"
-
-  vpc_id                     = module.vpc-inspection.vpc_id
-}
-module "fwaas-route-table-association-az1" {
-  source   = "git::https://github.com/40netse/terraform-modules.git//aws_route_table_association"
-
-  subnet_ids                 = module.subnet-inspection-fwaas-az1.id
-  route_table_id             = module.inspection-fwaas-route-table-az1.id
-}
+# module "inspection-gwlbe-route-table-az1" {
+#   source  = "git::https://github.com/40netse/terraform-modules.git//aws_route_table"
+#   rt_name = "${var.cp}-${var.env}-inspection-gwlbe-rt-az1"
+#
+#   vpc_id                     = module.vpc-inspection.vpc_id
+# }
+# module "gwlbe-route-table-association-az1" {
+#   source   = "git::https://github.com/40netse/terraform-modules.git//aws_route_table_association"
+#
+#   subnet_ids                 = module.subnet-inspection-gwlbe-az1.id
+#   route_table_id             = module.inspection-gwlbe-route-table-az1.id
+# }
 
 #
 # AZ 2
@@ -183,28 +183,18 @@ resource aws_ec2_tag "subnet_public_tag_az2" {
   key = "Workshop-area"
   value = "Public-Az2"
 }
-module "subnet-inspection-fwaas-az2" {
+module "subnet-inspection-gwlbe-az2" {
   source = "git::https://github.com/40netse/terraform-modules.git//aws_subnet"
-  subnet_name                = "${var.cp}-${var.env}-inspection-fwaas-az2-subnet"
+  subnet_name                = "${var.cp}-${var.env}-inspection-gwlbe-az2-subnet"
 
   vpc_id                     = module.vpc-inspection.vpc_id
   availability_zone          = local.availability_zone_2
-  subnet_cidr                = local.fwaas_subnet_cidr_az2
+  subnet_cidr                = local.gwlbe_subnet_cidr_az2
 }
-resource aws_ec2_tag "subnet_fwaas_tag_az2" {
-  resource_id = module.subnet-inspection-fwaas-az2.id
+resource aws_ec2_tag "subnet_gwlbe_tag_az2" {
+  resource_id = module.subnet-inspection-gwlbe-az2.id
   key = "Workshop-area"
-  value = "Fwaas-Az2"
-}
-resource aws_ec2_tag "fwaas_tag_az1" {
-  resource_id = module.subnet-inspection-fwaas-az1.id
-  key = "fortigatecnf_subnet_type"
-  value = "endpoint"
-}
-resource aws_ec2_tag "fwaas_tag_az2" {
-  resource_id = module.subnet-inspection-fwaas-az2.id
-  key = "fortigatecnf_subnet_type"
-  value = "endpoint"
+  value = "gwlbe-Az2"
 }
 module "subnet-inspection-private-az2" {
   source = "git::https://github.com/40netse/terraform-modules.git//aws_subnet"
@@ -260,18 +250,18 @@ module "inspection-private-route-table-az2-association" {
   subnet_ids                 = module.subnet-inspection-private-az2.id
   route_table_id             = module.inspection-private-route-table-az2.id
 }
-module "inspection-fwaas-route-table-az2" {
-  source  = "git::https://github.com/40netse/terraform-modules.git//aws_route_table"
-  rt_name = "${var.cp}-${var.env}-inspection-fwaas-rt-az2"
-
-  vpc_id                     = module.vpc-inspection.vpc_id
-}
-module "inspection-fwaas-route-table-association" {
-  source   = "git::https://github.com/40netse/terraform-modules.git//aws_route_table_association"
-
-  subnet_ids                 = module.subnet-inspection-fwaas-az2.id
-  route_table_id             = module.inspection-fwaas-route-table-az2.id
-}
+# module "inspection-gwlbe-route-table-az2" {
+#   source  = "git::https://github.com/40netse/terraform-modules.git//aws_route_table"
+#   rt_name = "${var.cp}-${var.env}-inspection-gwlbe-rt-az2"
+#
+#   vpc_id                     = module.vpc-inspection.vpc_id
+# }
+# module "inspection-gwlbe-route-table-association" {
+#   source   = "git::https://github.com/40netse/terraform-modules.git//aws_route_table_association"
+#
+#   subnet_ids                 = module.subnet-inspection-gwlbe-az2.id
+#   route_table_id             = module.inspection-gwlbe-route-table-az2.id
+# }
 
 #
 # Default route table that is created with the main VPC.
@@ -311,30 +301,30 @@ resource "aws_route" "inspection-public-route-spoke-az2" {
 }
 
 #
-# Fwaas Routes
+# gwlbe Routes
 #
-resource "aws_route" "inspection-fwaas-default-route-az1" {
-  route_table_id         = module.inspection-fwaas-route-table-az1.id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.vpc-inspection-az1.id
-}
-resource "aws_route" "inspection-fwaas-default-route-az2" {
-  route_table_id         = module.inspection-fwaas-route-table-az2.id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.vpc-inspection-az2.id
-}
-resource "aws_route" "inspection-fwaas-spoke-route-az1" {
-  depends_on             = [module.vpc-transit-gateway-attachment-inspection.tgw_attachment_id]
-  route_table_id         = module.inspection-fwaas-route-table-az1.id
-  destination_cidr_block = var.vpc_cidr_spoke
-  transit_gateway_id         = module.vpc-transit-gateway.tgw_id
-}
-resource "aws_route" "inspection-fwaas-spoke-route-az2" {
-  depends_on             = [module.vpc-transit-gateway-attachment-inspection.tgw_attachment_id]
-  route_table_id         = module.inspection-fwaas-route-table-az2.id
-  destination_cidr_block = var.vpc_cidr_spoke
-  transit_gateway_id         = module.vpc-transit-gateway.tgw_id
-}
+# resource "aws_route" "inspection-gwlbe-default-route-az1" {
+#   route_table_id         = module.inspection-gwlbe-route-table-az1.id
+#   destination_cidr_block = "0.0.0.0/0"
+#   nat_gateway_id         = aws_nat_gateway.vpc-inspection-az1.id
+# }
+# resource "aws_route" "inspection-gwlbe-default-route-az2" {
+#   route_table_id         = module.inspection-gwlbe-route-table-az2.id
+#   destination_cidr_block = "0.0.0.0/0"
+#   nat_gateway_id         = aws_nat_gateway.vpc-inspection-az2.id
+# }
+# resource "aws_route" "inspection-gwlbe-spoke-route-az1" {
+#   depends_on             = [module.vpc-transit-gateway-attachment-inspection.tgw_attachment_id]
+#   route_table_id         = module.inspection-gwlbe-route-table-az1.id
+#   destination_cidr_block = var.vpc_cidr_spoke
+#   transit_gateway_id         = module.vpc-transit-gateway.tgw_id
+# }
+# resource "aws_route" "inspection-gwlbe-spoke-route-az2" {
+#   depends_on             = [module.vpc-transit-gateway-attachment-inspection.tgw_attachment_id]
+#   route_table_id         = module.inspection-gwlbe-route-table-az2.id
+#   destination_cidr_block = var.vpc_cidr_spoke
+#   transit_gateway_id         = module.vpc-transit-gateway.tgw_id
+# }
 
 #
 # Private Routes. These two tables need a more specific subnet added after the GWLBe is deployed
