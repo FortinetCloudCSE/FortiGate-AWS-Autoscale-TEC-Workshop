@@ -11,36 +11,36 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
 
   module_prefix = "ew"
   existing_security_vpc = {
-    id = module.vpc-ns-inspection.vpc_id
+    id = module.ew-vpc-inspection.vpc_id
   }
   existing_igw = {
-    id = module.vpc-igw-ns-inspection.igw_id
+    id = module.ew-vpc-igw-inspection.igw_id
   }
   existing_tgw = {
   }
   existing_subnets = {
     fgt_login_us_west_2a = {
-      id = module.subnet-ns-inspection-public-az1.id
+      id = module.ew-subnet-inspection-public-az1.id
       availability_zone = local.availability_zone_1
     },
     fgt_login_us_west_2c = {
-      id = module.subnet-ns-inspection-public-az2.id
+      id = module.ew-subnet-inspection-public-az2.id
       availability_zone = local.availability_zone_2
     },
     gwlbe_us_west_2a = {
-      id = module.subnet-ns-inspection-gwlbe-az1.id
+      id = module.ew-subnet-inspection-gwlbe-az1.id
       availability_zone = local.availability_zone_1
     },
     gwlbe_us_west_2c = {
-      id = module.subnet-ns-inspection-gwlbe-az2.id
+      id = module.ew-subnet-inspection-gwlbe-az2.id
       availability_zone = local.availability_zone_2
     },
     fgt_internal_us_west_2a = {
-      id = module.subnet-ns-inspection-private-az1.id
+      id = module.ew-subnet-inspection-private-az1.id
       availability_zone = local.availability_zone_1
     },
     fgt_internal_us_west_2c = {
-      id = module.subnet-ns-inspection-private-az2.id
+      id = module.ew-subnet-inspection-private-az2.id
       availability_zone = local.availability_zone_2
     }
   }
@@ -68,7 +68,7 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
     }
   }
 
-  vpc_cidr_block     = var.vpc_cidr_ns_inspection
+  vpc_cidr_block     = var.vpc_cidr_ew_inspection
 # spoke_cidr_list    = [var.vpc_cidr_east, var.vpc_cidr_west]
   spoke_cidr_list    = [ ]
   availability_zones = [local.availability_zone_1, local.availability_zone_2]
@@ -78,7 +78,7 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
   tgw_description = "tgw for fortigate autoscaale group"
 
   ## Auto scale group
-  # This example is a hybird license ASG
+  # This example is a hybrid license ASG
   fgt_intf_mode = "2-arm"
   asgs = {
     fgt_byol_asg = {
@@ -87,7 +87,7 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
       license_type    = "byol"
       fgt_password    = var.fortigate_asg_password
       keypair_name    = var.keypair
-      lic_folder_path = "./license"
+      lic_folder_path = "./ew_license"
       # fortiflex_refresh_token = "<YOUR-OWN-VALUE>" # e.g. "NasmPa0CXpd56n6TzJjGqpqZm9Thyw"
       # fortiflex_sn_list = "<YOUR-OWN-VALUE>" # e.g. ["FGVMMLTM00000001", "FGVMMLTM00000002"]
       # fortiflex_configid_list = "<YOUR-OWN-VALUE>" # e.g. [2343]

@@ -41,6 +41,9 @@ variable "env" {
 variable "vpc_cidr_ns_inspection" {
     description = "CIDR for the whole NS inspection VPC"
 }
+variable "vpc_cidr_ew_inspection" {
+    description = "CIDR for the whole EW inspection VPC"
+}
 variable "vpc_cidr_east" {
     description = "CIDR for the whole east VPC"
 }

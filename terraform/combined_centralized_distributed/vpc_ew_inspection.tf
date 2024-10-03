@@ -1,3 +1,21 @@
+locals {
+  ew_public_subnet_cidr_az1 = cidrsubnet(var.vpc_cidr_ew_inspection, var.subnet_bits, var.public_subnet_index)
+}
+locals {
+  ew_public_subnet_cidr_az2 = cidrsubnet(var.vpc_cidr_ew_inspection, var.subnet_bits, var.public_subnet_index + 3)
+}
+locals {
+  ew_gwlbe_subnet_cidr_az1 = cidrsubnet(var.vpc_cidr_ew_inspection, var.subnet_bits, var.gwlbe_subnet_index)
+}
+locals {
+  ew_gwlbe_subnet_cidr_az2 = cidrsubnet(var.vpc_cidr_ew_inspection, var.subnet_bits, var.gwlbe_subnet_index + 3)
+}
+locals {
+  ew_private_subnet_cidr_az1 = cidrsubnet(var.vpc_cidr_ew_inspection, var.subnet_bits, var.private_subnet_index)
+}
+locals {
+  ew_private_subnet_cidr_az2 = cidrsubnet(var.vpc_cidr_ew_inspection, var.subnet_bits, var.private_subnet_index + 3)
+}
 
 data "aws_vpc_endpoint" "ew_asg_endpoint_az1" {
   depends_on = [module.spk_tgw_gwlb_asg_fgt_igw_ew]
@@ -21,7 +39,7 @@ data "aws_vpc_endpoint" "ew_asg_endpoint_az2" {
 module "ew-vpc-inspection" {
   source = "git::https://github.com/40netse/terraform-modules.git//aws_vpc"
   vpc_name                   = "${var.cp}-${var.env}-ew-inspection-vpc"
-  vpc_cidr                   = var.vpc_cidr_ns_inspection
+  vpc_cidr                   = var.vpc_cidr_ew_inspection
 }
 
 module "ew-vpc-igw-inspection" {
@@ -60,7 +78,7 @@ module "ew-subnet-inspection-public-az1" {
 
   vpc_id                     = module.ew-vpc-inspection.vpc_id
   availability_zone          = local.availability_zone_1
-  subnet_cidr                = local.public_subnet_cidr_az1
+  subnet_cidr                = local.ew_public_subnet_cidr_az1
 }
 
 module "ew-subnet-inspection-gwlbe-az1" {
@@ -69,7 +87,7 @@ module "ew-subnet-inspection-gwlbe-az1" {
 
   vpc_id                     = module.ew-vpc-inspection.vpc_id
   availability_zone          = local.availability_zone_1
-  subnet_cidr                = local.gwlbe_subnet_cidr_az1
+  subnet_cidr                = local.ew_gwlbe_subnet_cidr_az1
 }
 
 
@@ -79,7 +97,7 @@ module "ew-subnet-inspection-private-az1" {
 
   vpc_id                     = module.ew-vpc-inspection.vpc_id
   availability_zone          = local.availability_zone_1
-  subnet_cidr                = local.private_subnet_cidr_az1
+  subnet_cidr                = local.ew_private_subnet_cidr_az1
 }
 
 module "ew-inspection-private-route-table-az1" {
@@ -115,7 +133,7 @@ module "ew-vpc-transit-gateway-attachment-ew-inspection" {
   tgw_attachment_name            = "${var.cp}-${var.env}-inspection-ew-tgw-attachment"
 
   transit_gateway_id                              = data.aws_ec2_transit_gateway.tgw.id
-  subnet_ids                                      = local.tgw_attachment_subnet_ids
+  subnet_ids                                      = [module.ew-subnet-inspection-private-az1.id, module.ew-subnet-inspection-private-az2.id]
   transit_gateway_default_route_table_propogation = "true"
   appliance_mode_support                          = "enable"
   vpc_id                                          = module.ew-vpc-inspection.vpc_id
@@ -141,7 +159,7 @@ module "ew-subnet-inspection-public-az2" {
 
   vpc_id                     = module.ew-vpc-inspection.vpc_id
   availability_zone          = local.availability_zone_2
-  subnet_cidr                = local.public_subnet_cidr_az2
+  subnet_cidr                = local.ew_public_subnet_cidr_az2
 }
 
 module "ew-subnet-inspection-gwlbe-az2" {
@@ -150,7 +168,7 @@ module "ew-subnet-inspection-gwlbe-az2" {
 
   vpc_id                     = module.ew-vpc-inspection.vpc_id
   availability_zone          = local.availability_zone_2
-  subnet_cidr                = local.gwlbe_subnet_cidr_az2
+  subnet_cidr                = local.ew_gwlbe_subnet_cidr_az2
 }
 
 module "ew-subnet-inspection-private-az2" {
@@ -159,7 +177,7 @@ module "ew-subnet-inspection-private-az2" {
 
   vpc_id                     = module.ew-vpc-inspection.vpc_id
   availability_zone          = local.availability_zone_2
-  subnet_cidr                = local.private_subnet_cidr_az2
+  subnet_cidr                = local.ew_private_subnet_cidr_az2
 }
 module "ew-inspection-public-route-table-az1" {
   source  = "git::https://github.com/40netse/terraform-modules.git//aws_route_table"
