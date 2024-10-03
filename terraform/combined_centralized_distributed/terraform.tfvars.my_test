@@ -39,14 +39,18 @@ enable_tgw_attachment_subnet   = true
 enable_tgw_attachment          = true
 
 attach_to_tgw_name          = "mdw-test-lab-tgw"
-
+endpoint_name_az1           = "ns-ns-gwlbe_us_west_2a"
+endpoint_name_az2           = "ns-ns-gwlbe_us_west_2c"
+ew_endpoint_name_az1        = "ew-ew-gwlbe_us_west_2a"
+ew_endpoint_name_az2        = "ew-ew-gwlbe_us_west_2c"
 #
 # cp (customer_prefix) and env (environment) prepended to all resources created by the template.
 # Used for identification. e.g. "<customer_prefix>-<prod/test/dev>"
 #
 cp                          = "mdw-test"
 env                         = "lab"
-vpc_cidr_ns_inspection      = "10.88.0.0/17"
+
+vpc_cidr_ns_inspection      = "10.88.0.0/21"
 
 vpc_cidr_jump_box           = "10.0.0.0/24"
 vpc_cidr_spoke              = "192.168.0.0/16"

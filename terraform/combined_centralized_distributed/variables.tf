@@ -70,6 +70,26 @@ variable "attach_to_tgw_name" {
   type        = string
   default     = ""
 }
+variable "endpoint_name_az1" {
+  description = "Name of the gwlb endpoint to route to in AZ1"
+  type        = string
+  default     = ""
+}
+variable "endpoint_name_az2" {
+  description = "Name of the gwlb endpoint to route to in AZ2"
+  type        = string
+  default     = ""
+}
+variable "ew_endpoint_name_az1" {
+  description = "Name of the gwlb endpoint to route to in AZ1"
+  type        = string
+  default     = ""
+}
+variable "ew_endpoint_name_az2" {
+  description = "Name of the gwlb endpoint to route to in AZ2"
+  type        = string
+  default     = ""
+}
 variable "enable_tgw_attachment_subnet" {
   description = "Boolean to allow creation of TGW Attachment subnet in each AZ of Inspection VPC"
   type        = bool

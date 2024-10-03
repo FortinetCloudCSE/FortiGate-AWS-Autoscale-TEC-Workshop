@@ -12,6 +12,15 @@ provider "aws" {
 }
 
 locals {
+  rfc1918_192 = "192.168.0.0/16"
+}
+locals {
+  rfc1918_10 = "10.0.0.0/8"
+}
+locals {
+  rfc1918_172 = "172.16.0.0/12"
+}
+locals {
   subnet_index_addend = var.enable_tgw_attachment_subnet ? 4 : 3
 }
 locals {
@@ -62,6 +71,22 @@ data "aws_ec2_transit_gateway" "tgw" {
   filter {
     name   = "state"
     values = ["available"]
+  }
+}
+
+data "aws_vpc_endpoint" "asg_endpoint_az1" {
+  depends_on = [module.spk_tgw_gwlb_asg_fgt_igw]
+  filter {
+    name   = "tag:Name"
+    values = [var.endpoint_name_az1]
+  }
+}
+
+data "aws_vpc_endpoint" "asg_endpoint_az2" {
+  depends_on = [module.spk_tgw_gwlb_asg_fgt_igw]
+  filter {
+    name   = "tag:Name"
+    values = [var.endpoint_name_az2]
   }
 }
 
@@ -129,11 +154,6 @@ module "subnet-ns-inspection-public-az1" {
   availability_zone          = local.availability_zone_1
   subnet_cidr                = local.public_subnet_cidr_az1
 }
-resource aws_ec2_tag "subnet_public_tag_az1" {
-  resource_id = module.subnet-ns-inspection-public-az1.id
-  key = "Workshop-area"
-  value = "Public-Az1"
-}
 
 module "subnet-ns-inspection-gwlbe-az1" {
   source = "git::https://github.com/40netse/terraform-modules.git//aws_subnet"
@@ -144,11 +164,6 @@ module "subnet-ns-inspection-gwlbe-az1" {
   subnet_cidr                = local.gwlbe_subnet_cidr_az1
 }
 
-resource aws_ec2_tag "subnet_gwlbe_tag_az1" {
-  resource_id = module.subnet-ns-inspection-gwlbe-az1.id
-  key = "Workshop-area"
-  value = "Gwlbe-Az1"
-}
 
 module "subnet-ns-inspection-private-az1" {
   source = "git::https://github.com/40netse/terraform-modules.git//aws_subnet"
@@ -158,11 +173,7 @@ module "subnet-ns-inspection-private-az1" {
   availability_zone          = local.availability_zone_1
   subnet_cidr                = local.private_subnet_cidr_az1
 }
-resource aws_ec2_tag "subnet_private_tag_az1" {
-  resource_id = module.subnet-ns-inspection-private-az1.id
-  key = "Workshop-area"
-  value = "Private-Az1"
-}
+
 module "inspection-private-route-table-az1" {
   source  = "git::https://github.com/40netse/terraform-modules.git//aws_route_table"
   rt_name = "${var.cp}-${var.env}-ns-inspection-private-rt-az1"
@@ -196,16 +207,11 @@ module "subnet-ns-inspection-tgw-az1" {
   availability_zone          = local.availability_zone_1
   subnet_cidr                = local.tgw_subnet_cidr_az1
 }
-resource aws_ec2_tag "subnet_tgw_tag_az1" {
-  count       = var.enable_tgw_attachment_subnet ? 1 : 0
-  resource_id = module.subnet-ns-inspection-tgw-az1[0].id
-  key         = "Workshop-area"
-  value       = "TGW-Az1"
-}
+
 module "inspection-tgw-route-table-az1" {
   source  = "git::https://github.com/40netse/terraform-modules.git//aws_route_table"
   count   = var.enable_tgw_attachment_subnet ? 1 : 0
-  rt_name = "${var.cp}-${var.env}-inspection-rt-az1-tgw"
+  rt_name = "${var.cp}-${var.env}-inspection-tgw-rt-az1"
 
   vpc_id                     = module.vpc-ns-inspection.vpc_id
 }
@@ -255,11 +261,7 @@ module "subnet-ns-inspection-public-az2" {
   availability_zone          = local.availability_zone_2
   subnet_cidr                = local.public_subnet_cidr_az2
 }
-resource aws_ec2_tag "subnet_public_tag_az2" {
-  resource_id = module.subnet-ns-inspection-public-az2.id
-  key = "Workshop-area"
-  value = "Public-Az2"
-}
+
 module "subnet-ns-inspection-gwlbe-az2" {
   source = "git::https://github.com/40netse/terraform-modules.git//aws_subnet"
   subnet_name                = "${var.cp}-${var.env}-ns-inspection-gwlbe-az2-subnet"
@@ -268,11 +270,7 @@ module "subnet-ns-inspection-gwlbe-az2" {
   availability_zone          = local.availability_zone_2
   subnet_cidr                = local.gwlbe_subnet_cidr_az2
 }
-resource aws_ec2_tag "subnet_gwlbe_tag_az2" {
-  resource_id = module.subnet-ns-inspection-gwlbe-az2.id
-  key = "Workshop-area"
-  value = "gwlbe-az2"
-}
+
 module "subnet-ns-inspection-private-az2" {
   source = "git::https://github.com/40netse/terraform-modules.git//aws_subnet"
   subnet_name                = "${var.cp}-${var.env}-ns-inspection-private-az2-subnet"
@@ -280,11 +278,6 @@ module "subnet-ns-inspection-private-az2" {
   vpc_id                     = module.vpc-ns-inspection.vpc_id
   availability_zone          = local.availability_zone_2
   subnet_cidr                = local.private_subnet_cidr_az2
-}
-resource aws_ec2_tag "subnet_inspection_private_tag_az2" {
-  resource_id = module.subnet-ns-inspection-private-az2.id
-  key = "Workshop-area"
-  value = "Private-Az2"
 }
 module "inspection-public-route-table-az1" {
   source  = "git::https://github.com/40netse/terraform-modules.git//aws_route_table"
@@ -349,16 +342,11 @@ module "subnet-ns-inspection-tgw-az2" {
   availability_zone          = local.availability_zone_2
   subnet_cidr                = local.tgw_subnet_cidr_az2
 }
-resource aws_ec2_tag "subnet_tgw_tag_az2" {
-  count       = var.enable_tgw_attachment_subnet ? 1 : 0
-  resource_id = module.subnet-ns-inspection-tgw-az2[0].id
-  key         = "Workshop-area"
-  value       = "TGW-Az2"
-}
+
 module "inspection-tgw-route-table-az2" {
   source  = "git::https://github.com/40netse/terraform-modules.git//aws_route_table"
   count   = var.enable_tgw_attachment_subnet ? 1 : 0
-  rt_name = "${var.cp}-${var.env}-inspection-rt-az2-tgw"
+  rt_name = "${var.cp}-${var.env}-inspection-tgw-rt-az2"
 
   vpc_id                     = module.vpc-ns-inspection.vpc_id
 }
@@ -383,26 +371,134 @@ resource "aws_default_route_table" "route_inspection" {
 # If not, make the default route go to the internet gateway.
 #
 resource "aws_route" "inspection-ns-public-default-route-ngw-az1" {
+  depends_on             = [aws_nat_gateway.vpc-ns-inspection-az1]
   count                  = var.enable_nat_gateway ? 1 : 0
   route_table_id         = module.inspection-public-route-table-az1.id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.vpc-ns-inspection-az1[0].id
 }
 resource "aws_route" "inspection-ns-public-default-route-ngw-az2" {
+  depends_on              = [aws_nat_gateway.vpc-ns-inspection-az2]
   count                  = var.enable_nat_gateway ? 1 : 0
   route_table_id         = module.inspection-public-route-table-az2.id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.vpc-ns-inspection-az2[0].id
 }
 resource "aws_route" "inspection-ns-public-default-route-igw-az1" {
+  depends_on             = [module.vpc-igw-ns-inspection]
   count                  = !var.enable_nat_gateway ? 1 : 0
   route_table_id         = module.inspection-public-route-table-az1.id
   destination_cidr_block = "0.0.0.0/0"
-  transit_gateway_id     = module.vpc-igw-ns-inspection.igw_id
+  gateway_id             = module.vpc-igw-ns-inspection.igw_id
 }
 resource "aws_route" "inspection-ns-public-default-route-igw-az2" {
+  depends_on             = [module.vpc-igw-ns-inspection]
   count                  = !var.enable_nat_gateway ? 1 : 0
   route_table_id         = module.inspection-public-route-table-az2.id
   destination_cidr_block = "0.0.0.0/0"
-  transit_gateway_id     = module.vpc-igw-ns-inspection.igw_id
+  gateway_id             = module.vpc-igw-ns-inspection.igw_id
+}
+#
+# This is a bit bruce force. Route all the rfc-1918 space to the TGW. More specific route will handle the local traffic.
+#
+resource "aws_route" "inspection-ns-public-192-route-igw-az1" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  route_table_id         = module.inspection-public-route-table-az1.id
+  destination_cidr_block = local.rfc1918_192
+  vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az1.id
+}
+resource "aws_route" "inspection-ns-public-192-route-igw-az2" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  route_table_id         = module.inspection-public-route-table-az2.id
+  destination_cidr_block = local.rfc1918_192
+  vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az2.id
+}
+resource "aws_route" "inspection-ns-public-10-route-igw-az1" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  route_table_id         = module.inspection-public-route-table-az1.id
+  destination_cidr_block = local.rfc1918_10
+  vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az1.id
+}
+resource "aws_route" "inspection-ns-public-10-route-igw-az2" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  route_table_id         = module.inspection-public-route-table-az2.id
+  destination_cidr_block = local.rfc1918_10
+  vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az2.id
+}
+resource "aws_route" "inspection-ns-public-172-route-igw-az1" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  route_table_id         = module.inspection-public-route-table-az1.id
+  destination_cidr_block = local.rfc1918_172
+  vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az1.id
+}
+resource "aws_route" "inspection-ns-public-172-route-igw-az2" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  route_table_id         = module.inspection-public-route-table-az2.id
+  destination_cidr_block = local.rfc1918_172
+  vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az2.id
+}
+
+#
+# gwlbe subnet routes
+#
+# resource "aws_route" "inspection-ns-gwlbe-default-route-igw-az1" {
+#   depends_on             = [module.vpc-igw-ns-inspection]
+#   route_table_id         = module.inspection-gwlbe-route-table-az1.id
+#   destination_cidr_block = "0.0.0.0/0"
+#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+# }
+# resource "aws_route" "inspection-ns-gwlbe-default-route-igw-az2" {
+#   depends_on             = [module.vpc-igw-ns-inspection]
+#   route_table_id         = module.inspection-gwlbe-route-table-az2.id
+#   destination_cidr_block = "0.0.0.0/0"
+#   transit_gateway_id             = data.aws_ec2_transit_gateway.tgw.id
+# }
+# resource "aws_route" "inspection-ns-gwlbe-192-route-igw-az1" {
+#   depends_on             = [module.vpc-igw-ns-inspection]
+#   route_table_id         = module.inspection-gwlbe-route-table-az1.id
+#   destination_cidr_block = local.rfc1918_192
+#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+# }
+# resource "aws_route" "inspection-ns-gwlbe-192-route-igw-az2" {
+#   depends_on             = [module.vpc-igw-ns-inspection]
+#   route_table_id         = module.inspection-gwlbe-route-table-az2.id
+#   destination_cidr_block = local.rfc1918_192
+#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+# }
+# resource "aws_route" "inspection-ns-gwlbe-10-route-igw-az1" {
+#   depends_on             = [module.vpc-igw-ns-inspection]
+#   route_table_id         = module.inspection-gwlbe-route-table-az1.id
+#   destination_cidr_block = local.rfc1918_10
+#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+# }
+# resource "aws_route" "inspection-ns-gwlbe-10-route-igw-az2" {
+#   depends_on             = [module.vpc-igw-ns-inspection]
+#   route_table_id         = module.inspection-gwlbe-route-table-az2.id
+#   destination_cidr_block = local.rfc1918_10
+#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+# }
+# resource "aws_route" "inspection-ns-gwlbe-172-route-igw-az1" {
+#   depends_on             = [module.vpc-igw-ns-inspection]
+#   route_table_id         = module.inspection-gwlbe-route-table-az1.id
+#   destination_cidr_block = local.rfc1918_172
+#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+# }
+# resource "aws_route" "inspection-ns-gwlbe-172-route-igw-az2" {
+#   depends_on             = [module.vpc-igw-ns-inspection]
+#   route_table_id         = module.inspection-gwlbe-route-table-az2.id
+#   destination_cidr_block = local.rfc1918_172
+#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+# }
+
+resource "aws_route" "inspection-ns-tgw-default-route-endpoint-az1" {
+  depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw, module.vpc-transit-gateway-attachment-ns-inspection]
+  route_table_id = var.enable_tgw_attachment ? module.inspection-tgw-route-table-az1[0].id : module.inspection-private-route-table-az1.id
+  destination_cidr_block = "0.0.0.0/0"
+  vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az1.id
+}
+resource "aws_route" "inspection-ns-tgw-default-route-endpoint-az2" {
+  depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw, module.vpc-transit-gateway-attachment-ns-inspection]
+  route_table_id = var.enable_tgw_attachment ? module.inspection-tgw-route-table-az2[0].id : module.inspection-private-route-table-az2.id
+  destination_cidr_block = "0.0.0.0/0"
+  vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az2.id
 }

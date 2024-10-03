@@ -1,17 +1,7 @@
-# data "aws_ec2_transit_gateway" "tgw" {
-#   filter {
-#     name   = "tag:Name"
-#     values = [var.attach_to_tgw_name]
-#   }
-#   filter {
-#     name   = "state"
-#     values = ["available"]
-#   }
-# }
 
 module "spk_tgw_gwlb_asg_fgt_igw" {
-  source = "git::https://github.com/fortinetdev/terraform-aws-cloud-modules.git//examples/spk_tgw_gwlb_asg_fgt_igw"
-  # source = "./terraform-aws-cloud-modules/examples/spk_tgw_gwlb_asg_fgt_igw"
+  # source = "git::https://github.com/fortinetdev/terraform-aws-cloud-modules.git//examples/spk_tgw_gwlb_asg_fgt_igw"
+  source = "./aws-terraform-modules/examples/spk_tgw_gwlb_asg_fgt_igw"
 
   ## Note: Please go through all arguments in this file and replace the content with your configuration! This file is just an example.
   ## "<YOUR-OWN-VALUE>" are parameters that you need to specify your own value.
@@ -19,6 +9,7 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
   ## Root config
   region     = var.aws_region
 
+  module_prefix = "ns"
   existing_security_vpc = {
     id = module.vpc-ns-inspection.vpc_id
   }
