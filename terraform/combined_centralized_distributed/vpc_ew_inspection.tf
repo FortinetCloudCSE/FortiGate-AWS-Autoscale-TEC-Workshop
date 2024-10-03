@@ -130,6 +130,7 @@ module "ew-gwlbe-route-table-association-az1" {
 #
 module "ew-vpc-transit-gateway-attachment-ew-inspection" {
   source                         = "git::https://github.com/40netse/terraform-modules.git//aws_tgw_attachment"
+  depends_on                     = [module.existing_resources]
   tgw_attachment_name            = "${var.cp}-${var.env}-inspection-ew-tgw-attachment"
 
   transit_gateway_id                              = data.aws_ec2_transit_gateway.tgw.id
@@ -262,18 +263,18 @@ resource "aws_route" "ew-inspection-public-default-route-ngw-az2" {
 #
 # gwlbe subnet routes
 #
-# resource "aws_route" "inspection-ew-gwlbe-default-route-igw-az1" {
-#   depends_on             = [module.existing_resources]
-#   route_table_id         = module.ew-inspection-gwlbe-route-table-az1.id
-#   destination_cidr_block = "0.0.0.0/0"
-#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-# }
-# resource "aws_route" "inspection-ew-gwlbe-default-route-igw-az2" {
-#   depends_on             = [module.existing_resources]
-#   route_table_id         = module.ew-inspection-gwlbe-route-table-az2.id
-#   destination_cidr_block = "0.0.0.0/0"
-#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-# }
+resource "aws_route" "inspection-ew-gwlbe-default-route-igw-az1" {
+  depends_on             = [module.existing_resources]
+  route_table_id         = module.ew-inspection-gwlbe-route-table-az1.id
+  destination_cidr_block = "0.0.0.0/0"
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "inspection-ew-gwlbe-default-route-igw-az2" {
+  depends_on             = [module.existing_resources]
+  route_table_id         = module.ew-inspection-gwlbe-route-table-az2.id
+  destination_cidr_block = "0.0.0.0/0"
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
 
 resource "aws_route" "inspection-ew-tgw-default-route-endpoint-az1" {
   depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw_ew]
@@ -285,5 +286,5 @@ resource "aws_route" "inspection-ew-tgw-default-route-endpoint-az2" {
   depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw_ew]
   route_table_id         = module.ew-inspection-private-route-table-az2.id
   destination_cidr_block = "0.0.0.0/0"
-  vpc_endpoint_id        = data.aws_vpc_endpoint.ew_asg_endpoint_az1.id
+  vpc_endpoint_id        = data.aws_vpc_endpoint.ew_asg_endpoint_az2.id
 }

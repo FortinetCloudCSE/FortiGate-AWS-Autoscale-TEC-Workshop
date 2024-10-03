@@ -51,7 +51,7 @@ cp                          = "mdw-test"
 env                         = "lab"
 
 vpc_cidr_ns_inspection      = "10.88.0.0/21"
-
+vpc_cidr_ew_inspection      = "10.188.0.0/21"
 vpc_cidr_jump_box           = "10.0.0.0/24"
 vpc_cidr_spoke              = "192.168.0.0/16"
 

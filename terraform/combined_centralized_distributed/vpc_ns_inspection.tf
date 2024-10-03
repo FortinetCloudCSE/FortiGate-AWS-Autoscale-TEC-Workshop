@@ -441,54 +441,54 @@ resource "aws_route" "inspection-ns-public-172-route-igw-az2" {
 #
 # gwlbe subnet routes
 #
-# resource "aws_route" "inspection-ns-gwlbe-default-route-igw-az1" {
-#   depends_on             = [module.vpc-igw-ns-inspection]
-#   route_table_id         = module.inspection-gwlbe-route-table-az1.id
-#   destination_cidr_block = "0.0.0.0/0"
-#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-# }
-# resource "aws_route" "inspection-ns-gwlbe-default-route-igw-az2" {
-#   depends_on             = [module.vpc-igw-ns-inspection]
-#   route_table_id         = module.inspection-gwlbe-route-table-az2.id
-#   destination_cidr_block = "0.0.0.0/0"
-#   transit_gateway_id             = data.aws_ec2_transit_gateway.tgw.id
-# }
-# resource "aws_route" "inspection-ns-gwlbe-192-route-igw-az1" {
-#   depends_on             = [module.vpc-igw-ns-inspection]
-#   route_table_id         = module.inspection-gwlbe-route-table-az1.id
-#   destination_cidr_block = local.rfc1918_192
-#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-# }
-# resource "aws_route" "inspection-ns-gwlbe-192-route-igw-az2" {
-#   depends_on             = [module.vpc-igw-ns-inspection]
-#   route_table_id         = module.inspection-gwlbe-route-table-az2.id
-#   destination_cidr_block = local.rfc1918_192
-#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-# }
-# resource "aws_route" "inspection-ns-gwlbe-10-route-igw-az1" {
-#   depends_on             = [module.vpc-igw-ns-inspection]
-#   route_table_id         = module.inspection-gwlbe-route-table-az1.id
-#   destination_cidr_block = local.rfc1918_10
-#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-# }
-# resource "aws_route" "inspection-ns-gwlbe-10-route-igw-az2" {
-#   depends_on             = [module.vpc-igw-ns-inspection]
-#   route_table_id         = module.inspection-gwlbe-route-table-az2.id
-#   destination_cidr_block = local.rfc1918_10
-#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-# }
-# resource "aws_route" "inspection-ns-gwlbe-172-route-igw-az1" {
-#   depends_on             = [module.vpc-igw-ns-inspection]
-#   route_table_id         = module.inspection-gwlbe-route-table-az1.id
-#   destination_cidr_block = local.rfc1918_172
-#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-# }
-# resource "aws_route" "inspection-ns-gwlbe-172-route-igw-az2" {
-#   depends_on             = [module.vpc-igw-ns-inspection]
-#   route_table_id         = module.inspection-gwlbe-route-table-az2.id
-#   destination_cidr_block = local.rfc1918_172
-#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-# }
+resource "aws_route" "inspection-ns-gwlbe-default-route-igw-az1" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  route_table_id         = module.inspection-gwlbe-route-table-az1.id
+  destination_cidr_block = "0.0.0.0/0"
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "inspection-ns-gwlbe-default-route-igw-az2" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  route_table_id         = module.inspection-gwlbe-route-table-az2.id
+  destination_cidr_block = "0.0.0.0/0"
+  transit_gateway_id             = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "inspection-ns-gwlbe-192-route-igw-az1" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  route_table_id         = module.inspection-gwlbe-route-table-az1.id
+  destination_cidr_block = local.rfc1918_192
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "inspection-ns-gwlbe-192-route-igw-az2" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  route_table_id         = module.inspection-gwlbe-route-table-az2.id
+  destination_cidr_block = local.rfc1918_192
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "inspection-ns-gwlbe-10-route-igw-az1" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  route_table_id         = module.inspection-gwlbe-route-table-az1.id
+  destination_cidr_block = local.rfc1918_10
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "inspection-ns-gwlbe-10-route-igw-az2" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  route_table_id         = module.inspection-gwlbe-route-table-az2.id
+  destination_cidr_block = local.rfc1918_10
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "inspection-ns-gwlbe-172-route-igw-az1" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  route_table_id         = module.inspection-gwlbe-route-table-az1.id
+  destination_cidr_block = local.rfc1918_172
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "inspection-ns-gwlbe-172-route-igw-az2" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  route_table_id         = module.inspection-gwlbe-route-table-az2.id
+  destination_cidr_block = local.rfc1918_172
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
 
 resource "aws_route" "inspection-ns-tgw-default-route-endpoint-az1" {
   depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw, module.vpc-transit-gateway-attachment-ns-inspection]
