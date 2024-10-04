@@ -259,18 +259,17 @@ resource "aws_route" "ew-inspection-public-default-route-ngw-az2" {
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.ew-vpc-inspection-az2.id
 }
-
 #
 # gwlbe subnet routes
 #
 resource "aws_route" "inspection-ew-gwlbe-default-route-igw-az1" {
-  depends_on             = [module.existing_resources]
+  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
   route_table_id         = module.ew-inspection-gwlbe-route-table-az1.id
   destination_cidr_block = "0.0.0.0/0"
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ew-gwlbe-default-route-igw-az2" {
-  depends_on             = [module.existing_resources]
+  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
   route_table_id         = module.ew-inspection-gwlbe-route-table-az2.id
   destination_cidr_block = "0.0.0.0/0"
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id

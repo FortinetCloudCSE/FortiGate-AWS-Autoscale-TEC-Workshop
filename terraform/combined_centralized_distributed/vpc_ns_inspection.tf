@@ -402,37 +402,37 @@ resource "aws_route" "inspection-ns-public-default-route-igw-az2" {
 # This is a bit bruce force. Route all the rfc-1918 space to the TGW. More specific route will handle the local traffic.
 #
 resource "aws_route" "inspection-ns-public-192-route-igw-az1" {
-  depends_on             = [module.vpc-igw-ns-inspection]
+  depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw]
   route_table_id         = module.inspection-public-route-table-az1.id
   destination_cidr_block = local.rfc1918_192
   vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az1.id
 }
 resource "aws_route" "inspection-ns-public-192-route-igw-az2" {
-  depends_on             = [module.vpc-igw-ns-inspection]
+  depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw]
   route_table_id         = module.inspection-public-route-table-az2.id
   destination_cidr_block = local.rfc1918_192
   vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az2.id
 }
 resource "aws_route" "inspection-ns-public-10-route-igw-az1" {
-  depends_on             = [module.vpc-igw-ns-inspection]
+  depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw]
   route_table_id         = module.inspection-public-route-table-az1.id
   destination_cidr_block = local.rfc1918_10
   vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az1.id
 }
 resource "aws_route" "inspection-ns-public-10-route-igw-az2" {
-  depends_on             = [module.vpc-igw-ns-inspection]
+  depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw]
   route_table_id         = module.inspection-public-route-table-az2.id
   destination_cidr_block = local.rfc1918_10
   vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az2.id
 }
 resource "aws_route" "inspection-ns-public-172-route-igw-az1" {
-  depends_on             = [module.vpc-igw-ns-inspection]
+  depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw]
   route_table_id         = module.inspection-public-route-table-az1.id
   destination_cidr_block = local.rfc1918_172
   vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az1.id
 }
 resource "aws_route" "inspection-ns-public-172-route-igw-az2" {
-  depends_on             = [module.vpc-igw-ns-inspection]
+  depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw]
   route_table_id         = module.inspection-public-route-table-az2.id
   destination_cidr_block = local.rfc1918_172
   vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az2.id
@@ -442,62 +442,62 @@ resource "aws_route" "inspection-ns-public-172-route-igw-az2" {
 # gwlbe subnet routes
 #
 resource "aws_route" "inspection-ns-gwlbe-default-route-igw-az1" {
-  depends_on             = [module.vpc-igw-ns-inspection]
+  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az1.id
   destination_cidr_block = "0.0.0.0/0"
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ns-gwlbe-default-route-igw-az2" {
-  depends_on             = [module.vpc-igw-ns-inspection]
+  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az2.id
   destination_cidr_block = "0.0.0.0/0"
-  transit_gateway_id             = data.aws_ec2_transit_gateway.tgw.id
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ns-gwlbe-192-route-igw-az1" {
-  depends_on             = [module.vpc-igw-ns-inspection]
+  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az1.id
   destination_cidr_block = local.rfc1918_192
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ns-gwlbe-192-route-igw-az2" {
-  depends_on             = [module.vpc-igw-ns-inspection]
+  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az2.id
   destination_cidr_block = local.rfc1918_192
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ns-gwlbe-10-route-igw-az1" {
-  depends_on             = [module.vpc-igw-ns-inspection]
+  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az1.id
   destination_cidr_block = local.rfc1918_10
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ns-gwlbe-10-route-igw-az2" {
-  depends_on             = [module.vpc-igw-ns-inspection]
+  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az2.id
   destination_cidr_block = local.rfc1918_10
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ns-gwlbe-172-route-igw-az1" {
-  depends_on             = [module.vpc-igw-ns-inspection]
+  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az1.id
   destination_cidr_block = local.rfc1918_172
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ns-gwlbe-172-route-igw-az2" {
-  depends_on             = [module.vpc-igw-ns-inspection]
+  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az2.id
   destination_cidr_block = local.rfc1918_172
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 
 resource "aws_route" "inspection-ns-tgw-default-route-endpoint-az1" {
-  depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw, module.vpc-transit-gateway-attachment-ns-inspection]
+  depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw]
   route_table_id = var.enable_tgw_attachment ? module.inspection-tgw-route-table-az1[0].id : module.inspection-private-route-table-az1.id
   destination_cidr_block = "0.0.0.0/0"
   vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az1.id
 }
 resource "aws_route" "inspection-ns-tgw-default-route-endpoint-az2" {
-  depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw, module.vpc-transit-gateway-attachment-ns-inspection]
+  depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw]
   route_table_id = var.enable_tgw_attachment ? module.inspection-tgw-route-table-az2[0].id : module.inspection-private-route-table-az2.id
   destination_cidr_block = "0.0.0.0/0"
   vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az2.id
