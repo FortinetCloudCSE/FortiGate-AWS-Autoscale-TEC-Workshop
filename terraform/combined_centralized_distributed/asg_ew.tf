@@ -1,7 +1,7 @@
 
 module "spk_tgw_gwlb_asg_fgt_igw_ew" {
-  # source = "git::https://github.com/fortinetdev/terraform-aws-cloud-modules.git//examples/spk_tgw_gwlb_asg_fgt_igw"
-  source = "./aws-terraform-modules/examples/spk_tgw_gwlb_asg_fgt_igw"
+  source = "git::https://github.com/fortinetdev/terraform-aws-cloud-modules.git//examples/spk_tgw_gwlb_asg_fgt_igw"
+  # source = "./aws-terraform-modules/examples/spk_tgw_gwlb_asg_fgt_igw"
 
   ## Note: Please go through all arguments in this file and replace the content with your configuration! This file is just an example.
   ## "<YOUR-OWN-VALUE>" are parameters that you need to specify your own value.
@@ -75,7 +75,7 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
 
   ## Transit Gateway
   tgw_name        = "${var.cp}-${var.env}-tgw"
-  tgw_description = "tgw for fortigate autoscaale group"
+  tgw_description = "tgw for fortigate autoscale group"
 
   ## Auto scale group
   # This example is a hybrid license ASG
@@ -96,7 +96,7 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
         login_port    = "secgrp1"
         internal_port = "secgrp1"
       }
-      user_conf_file_path = "./fgt_config.conf"
+      user_conf_file_path = "./ew_fgt_config.conf"
       # There are 3 options for providing user_conf data:
       # user_conf_content : FortiGate Configuration
       # user_conf_file_path : The file path of configuration file
@@ -119,7 +119,7 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
         login_port    = "secgrp1"
         internal_port = "secgrp1"
       }
-      user_conf_file_path = "./fgt_config.conf"
+      user_conf_file_path = "./ew_fgt_config.conf"
       # There are 3 options for providing user_conf data:
       # user_conf_content : FortiGate Configuration
       # user_conf_file_path : The file path of configuration file

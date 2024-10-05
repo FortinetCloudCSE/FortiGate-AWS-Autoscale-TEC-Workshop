@@ -31,18 +31,19 @@ enable_jump_box                = true
 enable_fortimanager            = false
 enable_fortianalyzer           = false
 enable_nat_gateway             = false
-enable_build_existing_vpc      = true
+enable_build_existing_vpc      = false
 enable_jump_box_public_ip      = true
 enable_fortimanager_public_ip  = false
 enable_fortianalyzer_public_ip = false
 enable_tgw_attachment_subnet   = true
 enable_tgw_attachment          = true
+enable_linux_spoke_instances   = true
 
 attach_to_tgw_name          = "mdw-test-lab-tgw"
-endpoint_name_az1           = "ns-ns-gwlbe_us_west_2a"
-endpoint_name_az2           = "ns-ns-gwlbe_us_west_2c"
-ew_endpoint_name_az1        = "ew-ew-gwlbe_us_west_2a"
-ew_endpoint_name_az2        = "ew-ew-gwlbe_us_west_2c"
+endpoint_name_az1           = "ns-gwlbe_us_west_2a"
+endpoint_name_az2           = "ns-gwlbe_us_west_2c"
+ew_endpoint_name_az1        = "ew-gwlbe_us_west_2a"
+ew_endpoint_name_az2        = "ew-gwlbe_us_west_2c"
 #
 # cp (customer_prefix) and env (environment) prepended to all resources created by the template.
 # Used for identification. e.g. "<customer_prefix>-<prod/test/dev>"
@@ -53,8 +54,8 @@ env                         = "lab"
 vpc_cidr_ns_inspection      = "10.88.0.0/21"
 vpc_cidr_ew_inspection      = "10.188.0.0/21"
 vpc_cidr_jump_box           = "10.0.0.0/24"
-vpc_cidr_spoke              = "192.168.0.0/16"
 
+vpc_cidr_spoke              = "192.168.0.0/16"
 vpc_cidr_east               = "192.168.0.0/24"
 vpc_cidr_east_private_az1   = "192.168.0.0/28"
 vpc_cidr_east_private_az2   = "192.168.0.16/28"

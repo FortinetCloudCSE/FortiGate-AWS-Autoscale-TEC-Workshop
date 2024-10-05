@@ -1,7 +1,7 @@
 
 module "spk_tgw_gwlb_asg_fgt_igw" {
-  # source = "git::https://github.com/fortinetdev/terraform-aws-cloud-modules.git//examples/spk_tgw_gwlb_asg_fgt_igw"
-  source = "./aws-terraform-modules/examples/spk_tgw_gwlb_asg_fgt_igw"
+  source = "git::https://github.com/fortinetdev/terraform-aws-cloud-modules.git//examples/spk_tgw_gwlb_asg_fgt_igw"
+  # source = "./aws-terraform-modules/examples/spk_tgw_gwlb_asg_fgt_igw"
 
   ## Note: Please go through all arguments in this file and replace the content with your configuration! This file is just an example.
   ## "<YOUR-OWN-VALUE>" are parameters that you need to specify your own value.
@@ -87,7 +87,7 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
       license_type    = "byol"
       fgt_password    = var.fortigate_asg_password
       keypair_name    = var.keypair
-      lic_folder_path = "./license"
+      lic_folder_path = "./ns_license"
       # fortiflex_refresh_token = "<YOUR-OWN-VALUE>" # e.g. "NasmPa0CXpd56n6TzJjGqpqZm9Thyw"
       # fortiflex_sn_list = "<YOUR-OWN-VALUE>" # e.g. ["FGVMMLTM00000001", "FGVMMLTM00000002"]
       # fortiflex_configid_list = "<YOUR-OWN-VALUE>" # e.g. [2343]
@@ -96,7 +96,7 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
         login_port    = "secgrp1"
         internal_port = "secgrp1"
       }
-      user_conf_file_path = "./fgt_config.conf"
+      user_conf_file_path = "./ns_fgt_config.conf"
       # There are 3 options for providing user_conf data:
       # user_conf_content : FortiGate Configuration
       # user_conf_file_path : The file path of configuration file
@@ -119,7 +119,7 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
         login_port    = "secgrp1"
         internal_port = "secgrp1"
       }
-      user_conf_file_path = "./fgt_config.conf"
+      user_conf_file_path = "./ns_fgt_config.conf"
       # There are 3 options for providing user_conf data:
       # user_conf_content : FortiGate Configuration
       # user_conf_file_path : The file path of configuration file

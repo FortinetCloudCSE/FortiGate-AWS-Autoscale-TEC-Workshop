@@ -125,6 +125,10 @@ variable "enable_fortimanager" {
   description = "Boolean to allow creation of FortiManager in Inspection VPC"
   type        = bool
 }
+variable "enable_linux_spoke_instances" {
+  description = "Boolean to allow creation of Linux Spoke Instances in East and West VPCs"
+  type        = bool
+}
 variable "enable_fortimanager_public_ip" {
   description = "Boolean to allow creation of FortiManager public IP in Inspection VPC"
   type        = bool

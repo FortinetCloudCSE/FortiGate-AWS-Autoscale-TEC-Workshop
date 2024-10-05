@@ -132,15 +132,15 @@ resource "aws_nat_gateway" "vpc-ns-inspection-az2" {
   }
 }
 
-module "igw-route-table" {
+module "ns-igw-route-table" {
   source  = "git::https://github.com/40netse/terraform-modules.git//aws_route_table"
-  rt_name = "${var.cp}-${var.env}-igw-rt"
+  rt_name = "${var.cp}-${var.env}-ns-igw-rt"
 
   vpc_id                     = module.vpc-ns-inspection.vpc_id
 }
 resource "aws_route_table_association" "b" {
   gateway_id     = module.vpc-igw-ns-inspection.igw_id
-  route_table_id = module.igw-route-table.id
+  route_table_id = module.ns-igw-route-table.id
 }
 
 #
@@ -211,7 +211,7 @@ module "subnet-ns-inspection-tgw-az1" {
 module "inspection-tgw-route-table-az1" {
   source  = "git::https://github.com/40netse/terraform-modules.git//aws_route_table"
   count   = var.enable_tgw_attachment_subnet ? 1 : 0
-  rt_name = "${var.cp}-${var.env}-inspection-tgw-rt-az1"
+  rt_name = "${var.cp}-${var.env}-ns-inspection-tgw-rt-az1"
 
   vpc_id                     = module.vpc-ns-inspection.vpc_id
 }
@@ -228,7 +228,7 @@ module "inspection-tgw-route-table-association-az1" {
 module "vpc-transit-gateway-attachment-ns-inspection" {
   source                         = "git::https://github.com/40netse/terraform-modules.git//aws_tgw_attachment"
   count                          = var.enable_tgw_attachment  ? 1 : 0
-  tgw_attachment_name            = "${var.cp}-${var.env}-inspection-tgw-attachment"
+  tgw_attachment_name            = "${var.cp}-${var.env}-ns-inspection-tgw-attachment"
 
   transit_gateway_id                              = data.aws_ec2_transit_gateway.tgw.id
   subnet_ids                                      = local.tgw_attachment_subnet_ids
@@ -241,7 +241,7 @@ resource "aws_ec2_transit_gateway_route_table" "inspection" {
   count                           = var.enable_tgw_attachment ? 1 : 0
   transit_gateway_id              = data.aws_ec2_transit_gateway.tgw.id
   tags = {
-    Name = "${var.cp}-${var.env}-Inspection VPC TGW Route Table"
+    Name = "${var.cp}-${var.env}-NS Inspection VPC TGW Route Table"
   }
 }
 
@@ -346,7 +346,7 @@ module "subnet-ns-inspection-tgw-az2" {
 module "inspection-tgw-route-table-az2" {
   source  = "git::https://github.com/40netse/terraform-modules.git//aws_route_table"
   count   = var.enable_tgw_attachment_subnet ? 1 : 0
-  rt_name = "${var.cp}-${var.env}-inspection-tgw-rt-az2"
+  rt_name = "${var.cp}-${var.env}-ns-inspection-tgw-rt-az2"
 
   vpc_id                     = module.vpc-ns-inspection.vpc_id
 }
@@ -441,18 +441,18 @@ resource "aws_route" "inspection-ns-public-172-route-igw-az2" {
 #
 # gwlbe subnet routes
 #
-resource "aws_route" "inspection-ns-gwlbe-default-route-igw-az1" {
-  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
-  route_table_id         = module.inspection-gwlbe-route-table-az1.id
-  destination_cidr_block = "0.0.0.0/0"
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-}
-resource "aws_route" "inspection-ns-gwlbe-default-route-igw-az2" {
-  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
-  route_table_id         = module.inspection-gwlbe-route-table-az2.id
-  destination_cidr_block = "0.0.0.0/0"
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-}
+# resource "aws_route" "inspection-ns-gwlbe-default-route-igw-az1" {
+#   depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
+#   route_table_id         = module.inspection-gwlbe-route-table-az1.id
+#   destination_cidr_block = "0.0.0.0/0"
+#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+# }
+# resource "aws_route" "inspection-ns-gwlbe-default-route-igw-az2" {
+#   depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
+#   route_table_id         = module.inspection-gwlbe-route-table-az2.id
+#   destination_cidr_block = "0.0.0.0/0"
+#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+# }
 resource "aws_route" "inspection-ns-gwlbe-192-route-igw-az1" {
   depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az1.id

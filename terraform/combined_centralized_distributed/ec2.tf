@@ -32,7 +32,6 @@ resource "time_sleep" "wait_5_minutes" {
 }
 
 data "aws_subnet" "subnet-east-private-az1" {
-  count = var.enable_build_existing_vpc ? 1 : 0
   depends_on = [module.existing_resources]
   filter {
     name   = "tag:Name"
@@ -44,7 +43,6 @@ data "aws_subnet" "subnet-east-private-az1" {
   }
 }
 data "aws_subnet" "subnet-east-private-az2" {
-  count = var.enable_build_existing_vpc ? 1 : 0
   depends_on = [module.existing_resources]
   filter {
     name   = "tag:Name"
@@ -56,7 +54,6 @@ data "aws_subnet" "subnet-east-private-az2" {
   }
 }
 data "aws_subnet" "subnet-west-private-az1" {
-  count = var.enable_build_existing_vpc ? 1 : 0
   depends_on = [module.existing_resources]
   filter {
     name   = "tag:Name"
@@ -68,7 +65,6 @@ data "aws_subnet" "subnet-west-private-az1" {
   }
 }
 data "aws_subnet" "subnet-west-private-az2" {
-  count = var.enable_build_existing_vpc ? 1 : 0
   depends_on = [module.existing_resources]
   filter {
     name   = "tag:Name"
@@ -81,7 +77,6 @@ data "aws_subnet" "subnet-west-private-az2" {
 }
 
 data "aws_vpc" "vpc-east" {
-  count = var.enable_build_existing_vpc ? 1 : 0
   depends_on = [module.existing_resources]
   filter {
     name   = "tag:Name"
@@ -94,7 +89,6 @@ data "aws_vpc" "vpc-east" {
 }
 
 data "aws_vpc" "vpc-west" {
-  count = var.enable_build_existing_vpc ? 1 : 0
   depends_on = [module.existing_resources]
   filter {
     name   = "tag:Name"
@@ -119,7 +113,6 @@ resource "null_resource" "next" {
 # would not make it to a production template.
 #
 data "template_file" "web_userdata_az1" {
-  count       = var.enable_jump_box || var.enable_build_existing_vpc ? 1 : 0
   template = file("./config_templates/web-userdata.tpl")
   vars = {
     region                = var.aws_region
@@ -127,7 +120,6 @@ data "template_file" "web_userdata_az1" {
   }
 }
 data "template_file" "web_userdata_az2" {
-  count       = var.enable_jump_box || var.enable_build_existing_vpc ? 1 : 0
   template = file("./config_templates/web-userdata.tpl")
   vars = {
     region                = var.aws_region
@@ -159,13 +151,13 @@ data "aws_ami" "ubuntu" {
 #
 
 module "east_instance_private_az1" {
-  count                       = var.enable_build_existing_vpc ? 1 : 0
+  count                       = var.enable_linux_spoke_instances ? 1 : 0
   depends_on                  = [time_sleep.wait_5_minutes]
   source                      = "git::https://github.com/40netse/terraform-modules.git//aws_ec2_instance"
   aws_ec2_instance_name       = "${var.cp}-${var.env}-east-private-az1-instance"
   enable_public_ips           = false
   availability_zone           = local.availability_zone_1
-  public_subnet_id            = data.aws_subnet.subnet-east-private-az1[0].id
+  public_subnet_id            = data.aws_subnet.subnet-east-private-az1.id
   public_ip_address           = local.linux_east_az1_ip_address
   aws_ami                     = data.aws_ami.ubuntu.id
   keypair                     = var.keypair
@@ -173,17 +165,17 @@ module "east_instance_private_az1" {
   security_group_public_id    = aws_security_group.ec2-linux-east-vpc-sg[0].id
   acl                         = var.acl
   iam_instance_profile_id     = module.linux_iam_profile[0].id
-  userdata_rendered           = data.template_file.web_userdata_az1[0].rendered
+  userdata_rendered           = data.template_file.web_userdata_az1.rendered
 }
 
 module "east_instance_private_az2" {
-  count                       = var.enable_build_existing_vpc ? 1 : 0
+  count                       = var.enable_linux_spoke_instances ? 1 : 0
   depends_on                  = [time_sleep.wait_5_minutes]
   source                      = "git::https://github.com/40netse/terraform-modules.git//aws_ec2_instance"
   aws_ec2_instance_name       = "${var.cp}-${var.env}-east-private-az2-instance"
   enable_public_ips           = false
   availability_zone           = local.availability_zone_2
-  public_subnet_id            = data.aws_subnet.subnet-east-private-az2[0].id
+  public_subnet_id            = data.aws_subnet.subnet-east-private-az2.id
   public_ip_address           = local.linux_east_az2_ip_address
   aws_ami                     = data.aws_ami.ubuntu.id
   keypair                     = var.keypair
@@ -191,20 +183,20 @@ module "east_instance_private_az2" {
   security_group_public_id    = aws_security_group.ec2-linux-east-vpc-sg[0].id
   acl                         = var.acl
   iam_instance_profile_id     = module.linux_iam_profile[0].id
-  userdata_rendered           = data.template_file.web_userdata_az2[0].rendered
+  userdata_rendered           = data.template_file.web_userdata_az2.rendered
 }
 
 #
 # West Linux Instance for Generating West->East Traffic
 #
 module "west_instance_private_az1" {
-  count                       = var.enable_build_existing_vpc ? 1 : 0
+  count                       = var.enable_linux_spoke_instances ? 1 : 0
   depends_on                  = [time_sleep.wait_5_minutes]
   source                      = "git::https://github.com/40netse/terraform-modules.git//aws_ec2_instance"
   aws_ec2_instance_name       = "${var.cp}-${var.env}-west-private-az1-instance"
   enable_public_ips           = false
   availability_zone           = local.availability_zone_1
-  public_subnet_id            = data.aws_subnet.subnet-west-private-az1[0].id
+  public_subnet_id            = data.aws_subnet.subnet-west-private-az1.id
   public_ip_address           = local.linux_west_az1_ip_address
   aws_ami                     = data.aws_ami.ubuntu.id
   keypair                     = var.keypair
@@ -212,17 +204,17 @@ module "west_instance_private_az1" {
   security_group_public_id    = aws_security_group.ec2-linux-west-vpc-sg[0].id
   acl                         = var.acl
   iam_instance_profile_id     = module.linux_iam_profile[0].id
-  userdata_rendered           = data.template_file.web_userdata_az1[0].rendered
+  userdata_rendered           = data.template_file.web_userdata_az1.rendered
 }
 
 module "west_instance_private_az2" {
-  count                       = var.enable_build_existing_vpc ? 1 : 0
+  count                       = var.enable_linux_spoke_instances ? 1 : 0
   depends_on                  = [time_sleep.wait_5_minutes]
   source                      = "git::https://github.com/40netse/terraform-modules.git//aws_ec2_instance"
   aws_ec2_instance_name       = "${var.cp}-${var.env}-west-private-az2-instance"
   enable_public_ips           = false
   availability_zone           = local.availability_zone_2
-  public_subnet_id            = data.aws_subnet.subnet-west-private-az2[0].id
+  public_subnet_id            = data.aws_subnet.subnet-west-private-az2.id
   public_ip_address           = local.linux_west_az2_ip_address
   aws_ami                     = data.aws_ami.ubuntu.id
   keypair                     = var.keypair
@@ -230,16 +222,16 @@ module "west_instance_private_az2" {
   security_group_public_id    = aws_security_group.ec2-linux-west-vpc-sg[0].id
   acl                         = var.acl
   iam_instance_profile_id     = module.linux_iam_profile[0].id
-  userdata_rendered           = data.template_file.web_userdata_az2[0].rendered
+  userdata_rendered           = data.template_file.web_userdata_az2.rendered
 }
 
 #
 # Security Groups are VPC specific, so an "ALLOW ALL" for each VPC
 #
 resource "aws_security_group" "ec2-linux-east-vpc-sg" {
-  count                       = var.enable_build_existing_vpc ? 1 : 0
+  count                       = var.enable_linux_spoke_instances ? 1 : 0
   description                 = "Security Group for Linux Jump Box"
-  vpc_id                      = data.aws_vpc.vpc-east[0].id
+  vpc_id                      = data.aws_vpc.vpc-east.id
   ingress {
     description = "Allow SSH from Anywhere IPv4 (change this to My IP)"
     from_port = 22
@@ -291,9 +283,9 @@ resource "aws_security_group" "ec2-linux-east-vpc-sg" {
   }
 }
 resource "aws_security_group" "ec2-linux-west-vpc-sg" {
-  count                       = var.enable_build_existing_vpc ? 1 : 0
+  count                       = var.enable_linux_spoke_instances ? 1 : 0
   description                 = "Security Group for Linux Jump Box"
-  vpc_id                      = data.aws_vpc.vpc-west[0].id
+  vpc_id                      = data.aws_vpc.vpc-west.id
   ingress {
     description = "Allow SSH from Anywhere IPv4 (change this to My IP)"
     from_port = 22
@@ -408,7 +400,7 @@ resource "aws_security_group" "ec2-linux-jump-box-sg" {
 #
 module "linux_iam_profile" {
   source        = "git::https://github.com/40netse/terraform-modules.git//aws_ec2_instance_iam_role"
-  count         = var.enable_jump_box || var.enable_build_existing_vpc ? 1 : 0
+  count         = var.enable_jump_box || var.enable_linux_spoke_instances ? 1 : 0
   iam_role_name = "${var.cp}-${var.env}-${random_string.random.result}-linux-instance_role"
 }
 
@@ -429,7 +421,7 @@ module "inspection_instance_jump_box" {
   security_group_public_id    = aws_security_group.ec2-linux-jump-box-sg[0].id
   acl                         = var.acl
   iam_instance_profile_id     = module.linux_iam_profile[0].id
-  userdata_rendered           = data.template_file.web_userdata_az1[0].rendered
+  userdata_rendered           = data.template_file.web_userdata_az1.rendered
 }
 
 #

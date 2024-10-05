@@ -131,7 +131,7 @@ module "ew-gwlbe-route-table-association-az1" {
 module "ew-vpc-transit-gateway-attachment-ew-inspection" {
   source                         = "git::https://github.com/40netse/terraform-modules.git//aws_tgw_attachment"
   depends_on                     = [module.existing_resources]
-  tgw_attachment_name            = "${var.cp}-${var.env}-inspection-ew-tgw-attachment"
+  tgw_attachment_name            = "${var.cp}-${var.env}-ew-inspection-tgw-attachment"
 
   transit_gateway_id                              = data.aws_ec2_transit_gateway.tgw.id
   subnet_ids                                      = [module.ew-subnet-inspection-private-az1.id, module.ew-subnet-inspection-private-az2.id]
@@ -248,32 +248,70 @@ resource "aws_default_route_table" "ew_route_inspection" {
 # If not, make the default route go to the internet gateway.
 #
 resource "aws_route" "ew-inspection-public-default-route-ngw-az1" {
-  depends_on             = [aws_nat_gateway.ew-vpc-inspection-az1]
+  depends_on             = [module.ew-vpc-igw-inspection]
   route_table_id         = module.ew-inspection-public-route-table-az1.id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.ew-vpc-inspection-az1.id
+  gateway_id             = module.ew-vpc-igw-inspection.igw_id
 }
 resource "aws_route" "ew-inspection-public-default-route-ngw-az2" {
-  depends_on              = [aws_nat_gateway.ew-vpc-inspection-az2]
+  depends_on              = [module.ew-vpc-igw-inspection]
   route_table_id         = module.ew-inspection-public-route-table-az2.id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.ew-vpc-inspection-az2.id
+  gateway_id             = module.ew-vpc-igw-inspection.igw_id
 }
 #
 # gwlbe subnet routes
 #
-resource "aws_route" "inspection-ew-gwlbe-default-route-igw-az1" {
+# resource "aws_route" "inspection-ew-gwlbe-default-route-igw-az1" {
+#   depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
+#   route_table_id         = module.ew-inspection-gwlbe-route-table-az1.id
+#   destination_cidr_block = "0.0.0.0/0"
+#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+# }
+# resource "aws_route" "inspection-ew-gwlbe-default-route-igw-az2" {
+#   depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
+#   route_table_id         = module.ew-inspection-gwlbe-route-table-az2.id
+#   destination_cidr_block = "0.0.0.0/0"
+#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+# }
+
+resource "aws_route" "inspection-ew-gwlbe-192-route-igw-az1" {
   depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
   route_table_id         = module.ew-inspection-gwlbe-route-table-az1.id
-  destination_cidr_block = "0.0.0.0/0"
+  destination_cidr_block = local.rfc1918_192
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
-resource "aws_route" "inspection-ew-gwlbe-default-route-igw-az2" {
+resource "aws_route" "inspection-ew-gwlbe-192-route-igw-az2" {
   depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
   route_table_id         = module.ew-inspection-gwlbe-route-table-az2.id
-  destination_cidr_block = "0.0.0.0/0"
+  destination_cidr_block = local.rfc1918_192
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
+resource "aws_route" "inspection-ew-gwlbe-10-route-igw-az1" {
+  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
+  route_table_id         = module.ew-inspection-gwlbe-route-table-az1.id
+  destination_cidr_block = local.rfc1918_10
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "inspection-ew-gwlbe-10-route-igw-az2" {
+  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
+  route_table_id         = module.ew-inspection-gwlbe-route-table-az2.id
+  destination_cidr_block = local.rfc1918_10
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "inspection-ew-gwlbe-172-route-igw-az1" {
+  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
+  route_table_id         = module.ew-inspection-gwlbe-route-table-az1.id
+  destination_cidr_block = local.rfc1918_172
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "inspection-ew-gwlbe-172-route-igw-az2" {
+  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
+  route_table_id         = module.ew-inspection-gwlbe-route-table-az2.id
+  destination_cidr_block = local.rfc1918_172
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+
 
 resource "aws_route" "inspection-ew-tgw-default-route-endpoint-az1" {
   depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw_ew]
