@@ -9,7 +9,7 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
   ## Root config
   region     = var.aws_region
 
-  module_prefix = "ew"
+  module_prefix = var.ew_module_prefix
   existing_security_vpc = {
     id = module.ew-vpc-inspection.vpc_id
   }
@@ -87,7 +87,7 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
       license_type    = "byol"
       fgt_password    = var.fortigate_asg_password
       keypair_name    = var.keypair
-      lic_folder_path = "./ew_license"
+      lic_folder_path = var.ew_license_directory
       # fortiflex_refresh_token = "<YOUR-OWN-VALUE>" # e.g. "NasmPa0CXpd56n6TzJjGqpqZm9Thyw"
       # fortiflex_sn_list = "<YOUR-OWN-VALUE>" # e.g. ["FGVMMLTM00000001", "FGVMMLTM00000002"]
       # fortiflex_configid_list = "<YOUR-OWN-VALUE>" # e.g. [2343]

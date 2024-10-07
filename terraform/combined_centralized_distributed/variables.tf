@@ -105,6 +105,26 @@ variable "enable_jump_box" {
   description = "Boolean to allow creation of Linux Jump Box in Inspection VPC"
   type        = bool
 }
+variable "ew_module_prefix" {
+  description = "Module Prefix for East/West Autoscale Group"
+  type        = string
+  default     = ""
+}
+variable "ns_module_prefix" {
+  description = "Module Prefix for East/West Autoscale Group"
+  type        = string
+  default     = ""
+}
+variable "ew_license_directory" {
+  description = "License Directory for East/West Autoscale Group"
+  type        = string
+  default     = ""
+}
+variable "ns_license_directory" {
+  description = "License Directory for North/South Autoscale Group"
+  type        = string
+  default     = ""
+}
 #
 # This boolean creates the resources a customer might have in an existing VPC. I don't have existing resources, so
 # this boolean will allow the creation of a TGW, VPC east, and VPC west. For testing only.
