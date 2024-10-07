@@ -11,7 +11,7 @@ data "aws_ec2_transit_gateway_vpc_attachment" "tgw-attachment-ns-inspection" {
   }
 }
 data "aws_ec2_transit_gateway_vpc_attachment" "tgw-attachment-ew-inspection" {
-  depends_on = [module.vpc-transit-gateway-attachment-ns-inspection.tgw_attachment_id]
+  depends_on = [module.vpc-transit-gateway-attachment-ew-inspection.tgw_attachment_id]
   filter {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-ew-inspection-tgw-attachment"]
