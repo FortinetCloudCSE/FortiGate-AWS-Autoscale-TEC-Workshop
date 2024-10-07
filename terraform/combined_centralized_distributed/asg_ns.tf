@@ -19,27 +19,27 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
   existing_tgw = {
   }
   existing_subnets = {
-    fgt_login_us_west_2a = {
+    fgt_login_az1 = {
       id = module.subnet-ns-inspection-public-az1.id
       availability_zone = local.availability_zone_1
     },
-    fgt_login_us_west_2c = {
+    fgt_login_az2 = {
       id = module.subnet-ns-inspection-public-az2.id
       availability_zone = local.availability_zone_2
     },
-    gwlbe_us_west_2a = {
+    gwlbe_az1 = {
       id = module.subnet-ns-inspection-gwlbe-az1.id
       availability_zone = local.availability_zone_1
     },
-    gwlbe_us_west_2c = {
+    gwlbe_az2 = {
       id = module.subnet-ns-inspection-gwlbe-az2.id
       availability_zone = local.availability_zone_2
     },
-    fgt_internal_us_west_2a = {
+    fgt_internal_az1 = {
       id = module.subnet-ns-inspection-private-az1.id
       availability_zone = local.availability_zone_1
     },
-    fgt_internal_us_west_2c = {
+    fgt_internal_az2 = {
       id = module.subnet-ns-inspection-private-az2.id
       availability_zone = local.availability_zone_2
     }

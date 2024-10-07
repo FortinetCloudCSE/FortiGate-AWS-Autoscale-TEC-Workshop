@@ -1,3 +1,16 @@
+
+locals {
+    common_tags = {
+    Environment = var.env
+  }
+}
+provider "aws" {
+  region     = var.aws_region
+  default_tags {
+    tags = local.common_tags
+  }
+}
+
 locals {
   availability_zone_1 = "${var.aws_region}${var.availability_zone_1}"
 }

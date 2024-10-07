@@ -109,10 +109,6 @@ variable "enable_jump_box" {
 # This boolean creates the resources a customer might have in an existing VPC. I don't have existing resources, so
 # this boolean will allow the creation of a TGW, VPC east, and VPC west. For testing only.
 #
-variable "enable_build_existing_vpc" {
-  description = "Boolean to allow creation of resources associated with an existing VPC"
-  type        = bool
-}
 variable "enable_jump_box_public_ip" {
   description = "Boolean to allow creation of Linux Jump Box public IP in Inspection VPC"
   type        = bool

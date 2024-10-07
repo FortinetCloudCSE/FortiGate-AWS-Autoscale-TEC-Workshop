@@ -32,7 +32,6 @@ resource "time_sleep" "wait_5_minutes" {
 }
 
 data "aws_subnet" "subnet-east-private-az1" {
-  depends_on = [module.existing_resources]
   filter {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-east-private-az1-subnet"]
@@ -43,7 +42,6 @@ data "aws_subnet" "subnet-east-private-az1" {
   }
 }
 data "aws_subnet" "subnet-east-private-az2" {
-  depends_on = [module.existing_resources]
   filter {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-east-private-az2-subnet"]
@@ -54,7 +52,6 @@ data "aws_subnet" "subnet-east-private-az2" {
   }
 }
 data "aws_subnet" "subnet-west-private-az1" {
-  depends_on = [module.existing_resources]
   filter {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-west-private-az1-subnet"]
@@ -65,7 +62,6 @@ data "aws_subnet" "subnet-west-private-az1" {
   }
 }
 data "aws_subnet" "subnet-west-private-az2" {
-  depends_on = [module.existing_resources]
   filter {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-west-private-az2-subnet"]
@@ -77,7 +73,6 @@ data "aws_subnet" "subnet-west-private-az2" {
 }
 
 data "aws_vpc" "vpc-east" {
-  depends_on = [module.existing_resources]
   filter {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-east-vpc"]
@@ -89,7 +84,6 @@ data "aws_vpc" "vpc-east" {
 }
 
 data "aws_vpc" "vpc-west" {
-  depends_on = [module.existing_resources]
   filter {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-west-vpc"]

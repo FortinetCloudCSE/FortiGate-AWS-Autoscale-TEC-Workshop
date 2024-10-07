@@ -63,7 +63,6 @@ resource "random_string" "random" {
 }
 
 data "aws_ec2_transit_gateway" "tgw" {
-  depends_on = [module.existing_resources]
   filter {
     name   = "tag:Name"
     values = [var.attach_to_tgw_name]
@@ -454,37 +453,37 @@ resource "aws_route" "inspection-ns-public-172-route-igw-az2" {
 #   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 # }
 resource "aws_route" "inspection-ns-gwlbe-192-route-igw-az1" {
-  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
+  depends_on             = [time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az1.id
   destination_cidr_block = local.rfc1918_192
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ns-gwlbe-192-route-igw-az2" {
-  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
+  depends_on             = [time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az2.id
   destination_cidr_block = local.rfc1918_192
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ns-gwlbe-10-route-igw-az1" {
-  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
+  depends_on             = [time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az1.id
   destination_cidr_block = local.rfc1918_10
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ns-gwlbe-10-route-igw-az2" {
-  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
+  depends_on             = [time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az2.id
   destination_cidr_block = local.rfc1918_10
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ns-gwlbe-172-route-igw-az1" {
-  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
+  depends_on             = [time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az1.id
   destination_cidr_block = local.rfc1918_172
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ns-gwlbe-172-route-igw-az2" {
-  depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
+  depends_on             = [time_sleep.wait_5_minutes]
   route_table_id         = module.inspection-gwlbe-route-table-az2.id
   destination_cidr_block = local.rfc1918_172
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id

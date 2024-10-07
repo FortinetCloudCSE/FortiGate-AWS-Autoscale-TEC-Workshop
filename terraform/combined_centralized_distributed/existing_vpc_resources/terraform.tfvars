@@ -1,5 +1,5 @@
 
-aws_region                   = "us-west-2"
+aws_region                   = "us-east-1"
 availability_zone_1          = "a"
 availability_zone_2          = "c"
 
@@ -8,7 +8,7 @@ availability_zone_2          = "c"
 # cp (customer_prefix) and env (environment) prepended to all resources created by the template.
 # Used for identification. e.g. "<customer_prefix>-<prod/test/dev>"
 #
-cp                          = "mdw-test"
+cp                          = "mdw-etest"
 env                         = "lab"
 
 vpc_cidr_spoke              = "192.168.0.0/16"
