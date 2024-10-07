@@ -46,3 +46,11 @@ output "z_fortianalyzer_ip" {
   value = var.enable_fortianalyzer && var.enable_fortianalyzer_public_ip ? module.fortianalyzer[0].public_eip[0] : null
   description = "Fortianalyzer IP"
 }
+output "tgw_attachment_east_id" {
+  value       = data.aws_ec2_transit_gateway_vpc_attachment.tgw-attachment-east.id
+  description = "The East TGW Attachment ID."
+}
+output "tgw_attachment_west_id" {
+  value       = data.aws_ec2_transit_gateway_vpc_attachment.tgw-attachment-west.id
+  description = "The West TGW Attachment ID."
+}
