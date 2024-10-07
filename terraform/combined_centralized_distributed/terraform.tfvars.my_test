@@ -21,8 +21,8 @@ tgw_subnet_index            = 3
 #
 # Variables likely to change
 #
-keypair                     = "mdw-poc-common"
-my_ip                       = "76.184.215.100/32"
+keypair                     = ""
+my_ip                       = ""
 
 #
 # Allow creation of Linux instances in east/west VPCs
