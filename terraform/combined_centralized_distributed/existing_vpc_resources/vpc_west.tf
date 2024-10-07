@@ -54,7 +54,7 @@ resource "aws_route" "default-route-west-private-az1" {
   depends_on             = [module.vpc-transit-gateway-attachment-west.tgw_attachment_id]
   route_table_id         = module.route-table-west-private-az1.id
   destination_cidr_block = "0.0.0.0/0"
-  transit_gateway_id         = module.vpc-transit-gateway.tgw_id
+  transit_gateway_id     = module.vpc-transit-gateway.tgw_id
 }
 
 module "route-table-west-private-az2" {

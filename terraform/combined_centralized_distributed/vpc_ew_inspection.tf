@@ -143,7 +143,7 @@ module "ew-vpc-transit-gateway-attachment-ew-inspection" {
 resource "aws_ec2_transit_gateway_route_table" "ew-inspection" {
   transit_gateway_id              = data.aws_ec2_transit_gateway.tgw.id
   tags = {
-    Name = "${var.cp}-${var.env}-Inspection VPC TGW EW Route Table"
+    Name = "${var.cp}-${var.env}-EW Inspection VPC TGW Route Table"
   }
 }
 
