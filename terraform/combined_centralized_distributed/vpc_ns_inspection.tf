@@ -491,13 +491,29 @@ resource "aws_route" "inspection-ns-gwlbe-172-route-igw-az2" {
 
 resource "aws_route" "inspection-ns-tgw-default-route-endpoint-az1" {
   depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw]
-  route_table_id = var.enable_tgw_attachment ? module.inspection-tgw-route-table-az1[0].id : module.inspection-private-route-table-az1.id
+  count                  = var.enable_tgw_attachment_subnet  ? 1 : 0
+  route_table_id         = module.inspection-tgw-route-table-az1[0].id
   destination_cidr_block = "0.0.0.0/0"
   vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az1.id
 }
 resource "aws_route" "inspection-ns-tgw-default-route-endpoint-az2" {
   depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw]
-  route_table_id = var.enable_tgw_attachment ? module.inspection-tgw-route-table-az2[0].id : module.inspection-private-route-table-az2.id
+  count                  = var.enable_tgw_attachment_subnet  ? 1 : 0
+  route_table_id         = module.inspection-tgw-route-table-az2[0].id
+  destination_cidr_block = "0.0.0.0/0"
+  vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az2.id
+}
+resource "aws_route" "inspection-ns-private-default-route-endpoint-az1" {
+  depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw]
+  count                  = !var.enable_tgw_attachment_subnet  ? 1 : 0
+  route_table_id         = module.inspection-private-route-table-az1.id
+  destination_cidr_block = "0.0.0.0/0"
+  vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az1.id
+}
+resource "aws_route" "inspection-ns-private-default-route-endpoint-az2" {
+  depends_on             = [module.spk_tgw_gwlb_asg_fgt_igw]
+  count                  = !var.enable_tgw_attachment_subnet  ? 1 : 0
+  route_table_id         = module.inspection-private-route-table-az2.id
   destination_cidr_block = "0.0.0.0/0"
   vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az2.id
 }
