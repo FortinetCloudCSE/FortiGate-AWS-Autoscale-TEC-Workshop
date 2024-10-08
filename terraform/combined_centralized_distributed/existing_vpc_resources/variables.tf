@@ -13,6 +13,10 @@ variable "cp" {
 variable "env" {
   description = "The Tag Environment to differentiate prod/test/dev"
 }
+variable "enable_build_existing_subnets" {
+  description = "Enable building the existing subnets behind the TGW"
+  type        = bool
+}
 variable "vpc_cidr_east" {
     description = "CIDR for the whole east VPC"
 }

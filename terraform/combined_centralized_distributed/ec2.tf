@@ -32,6 +32,7 @@ resource "time_sleep" "wait_5_minutes" {
 }
 
 data "aws_subnet" "subnet-east-private-az1" {
+  count = var.enable_linux_spoke_instances ? 1 : 0
   filter {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-east-private-az1-subnet"]
@@ -42,6 +43,7 @@ data "aws_subnet" "subnet-east-private-az1" {
   }
 }
 data "aws_subnet" "subnet-east-private-az2" {
+  count = var.enable_linux_spoke_instances ? 1 : 0
   filter {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-east-private-az2-subnet"]
@@ -52,6 +54,7 @@ data "aws_subnet" "subnet-east-private-az2" {
   }
 }
 data "aws_subnet" "subnet-west-private-az1" {
+  count = var.enable_linux_spoke_instances ? 1 : 0
   filter {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-west-private-az1-subnet"]
@@ -62,6 +65,7 @@ data "aws_subnet" "subnet-west-private-az1" {
   }
 }
 data "aws_subnet" "subnet-west-private-az2" {
+  count = var.enable_linux_spoke_instances ? 1 : 0
   filter {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-west-private-az2-subnet"]
@@ -73,6 +77,7 @@ data "aws_subnet" "subnet-west-private-az2" {
 }
 
 data "aws_vpc" "vpc-east" {
+  count = var.enable_linux_spoke_instances ? 1 : 0
   filter {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-east-vpc"]
@@ -84,6 +89,7 @@ data "aws_vpc" "vpc-east" {
 }
 
 data "aws_vpc" "vpc-west" {
+  count = var.enable_linux_spoke_instances ? 1 : 0
   filter {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-west-vpc"]
@@ -107,6 +113,7 @@ resource "null_resource" "next" {
 # would not make it to a production template.
 #
 data "template_file" "web_userdata_az1" {
+  count = var.enable_linux_spoke_instances ? 1 : 0
   template = file("./config_templates/web-userdata.tpl")
   vars = {
     region                = var.aws_region
@@ -114,6 +121,7 @@ data "template_file" "web_userdata_az1" {
   }
 }
 data "template_file" "web_userdata_az2" {
+  count = var.enable_linux_spoke_instances ? 1 : 0
   template = file("./config_templates/web-userdata.tpl")
   vars = {
     region                = var.aws_region
@@ -122,6 +130,7 @@ data "template_file" "web_userdata_az2" {
 }
 
 data "aws_ami" "ubuntu" {
+  count = var.enable_linux_spoke_instances ? 1 : 0
   most_recent = true
 
   filter {
@@ -151,34 +160,34 @@ module "east_instance_private_az1" {
   aws_ec2_instance_name       = "${var.cp}-${var.env}-east-private-az1-instance"
   enable_public_ips           = false
   availability_zone           = local.availability_zone_1
-  public_subnet_id            = data.aws_subnet.subnet-east-private-az1.id
+  public_subnet_id            = data.aws_subnet.subnet-east-private-az1[0].id
   public_ip_address           = local.linux_east_az1_ip_address
-  aws_ami                     = data.aws_ami.ubuntu.id
+  aws_ami                     = data.aws_ami.ubuntu[0].id
   keypair                     = var.keypair
   instance_type               = var.linux_instance_type
   security_group_public_id    = aws_security_group.ec2-linux-east-vpc-sg[0].id
   acl                         = var.acl
   iam_instance_profile_id     = module.linux_iam_profile[0].id
-  userdata_rendered           = data.template_file.web_userdata_az1.rendered
+  userdata_rendered           = data.template_file.web_userdata_az1[0].rendered
 }
-#
-# module "east_instance_private_az2" {
-#   count                       = var.enable_linux_spoke_instances ? 1 : 0
-#   depends_on                  = [time_sleep.wait_5_minutes]
-#   source                      = "git::https://github.com/40netse/terraform-modules.git//aws_ec2_instance"
-#   aws_ec2_instance_name       = "${var.cp}-${var.env}-east-private-az2-instance"
-#   enable_public_ips           = false
-#   availability_zone           = local.availability_zone_2
-#   public_subnet_id            = data.aws_subnet.subnet-east-private-az2.id
-#   public_ip_address           = local.linux_east_az2_ip_address
-#   aws_ami                     = data.aws_ami.ubuntu.id
-#   keypair                     = var.keypair
-#   instance_type               = var.linux_instance_type
-#   security_group_public_id    = aws_security_group.ec2-linux-east-vpc-sg[0].id
-#   acl                         = var.acl
-#   iam_instance_profile_id     = module.linux_iam_profile[0].id
-#   userdata_rendered           = data.template_file.web_userdata_az2.rendered
-# }
+
+module "east_instance_private_az2" {
+  count                       = var.enable_linux_spoke_instances ? 1 : 0
+  depends_on                  = [time_sleep.wait_5_minutes]
+  source                      = "git::https://github.com/40netse/terraform-modules.git//aws_ec2_instance"
+  aws_ec2_instance_name       = "${var.cp}-${var.env}-east-private-az2-instance"
+  enable_public_ips           = false
+  availability_zone           = local.availability_zone_2
+  public_subnet_id            = data.aws_subnet.subnet-east-private-az2[0].id
+  public_ip_address           = local.linux_east_az2_ip_address
+  aws_ami                     = data.aws_ami.ubuntu[0].id
+  keypair                     = var.keypair
+  instance_type               = var.linux_instance_type
+  security_group_public_id    = aws_security_group.ec2-linux-east-vpc-sg[0].id
+  acl                         = var.acl
+  iam_instance_profile_id     = module.linux_iam_profile[0].id
+  userdata_rendered           = data.template_file.web_userdata_az2[0].rendered
+}
 
 #
 # West Linux Instance for Generating West->East Traffic
@@ -190,34 +199,34 @@ module "west_instance_private_az1" {
   aws_ec2_instance_name       = "${var.cp}-${var.env}-west-private-az1-instance"
   enable_public_ips           = false
   availability_zone           = local.availability_zone_1
-  public_subnet_id            = data.aws_subnet.subnet-west-private-az1.id
+  public_subnet_id            = data.aws_subnet.subnet-west-private-az1[0].id
   public_ip_address           = local.linux_west_az1_ip_address
-  aws_ami                     = data.aws_ami.ubuntu.id
+  aws_ami                     = data.aws_ami.ubuntu[0].id
   keypair                     = var.keypair
   instance_type               = var.linux_instance_type
   security_group_public_id    = aws_security_group.ec2-linux-west-vpc-sg[0].id
   acl                         = var.acl
   iam_instance_profile_id     = module.linux_iam_profile[0].id
-  userdata_rendered           = data.template_file.web_userdata_az1.rendered
+  userdata_rendered           = data.template_file.web_userdata_az1[0].rendered
 }
-#
-# module "west_instance_private_az2" {
-#   count                       = var.enable_linux_spoke_instances ? 1 : 0
-#   depends_on                  = [time_sleep.wait_5_minutes]
-#   source                      = "git::https://github.com/40netse/terraform-modules.git//aws_ec2_instance"
-#   aws_ec2_instance_name       = "${var.cp}-${var.env}-west-private-az2-instance"
-#   enable_public_ips           = false
-#   availability_zone           = local.availability_zone_2
-#   public_subnet_id            = data.aws_subnet.subnet-west-private-az2.id
-#   public_ip_address           = local.linux_west_az2_ip_address
-#   aws_ami                     = data.aws_ami.ubuntu.id
-#   keypair                     = var.keypair
-#   instance_type               = var.linux_instance_type
-#   security_group_public_id    = aws_security_group.ec2-linux-west-vpc-sg[0].id
-#   acl                         = var.acl
-#   iam_instance_profile_id     = module.linux_iam_profile[0].id
-#   userdata_rendered           = data.template_file.web_userdata_az2.rendered
-# }
+
+module "west_instance_private_az2" {
+  count                       = var.enable_linux_spoke_instances ? 1 : 0
+  depends_on                  = [time_sleep.wait_5_minutes]
+  source                      = "git::https://github.com/40netse/terraform-modules.git//aws_ec2_instance"
+  aws_ec2_instance_name       = "${var.cp}-${var.env}-west-private-az2-instance"
+  enable_public_ips           = false
+  availability_zone           = local.availability_zone_2
+  public_subnet_id            = data.aws_subnet.subnet-west-private-az2[0].id
+  public_ip_address           = local.linux_west_az2_ip_address
+  aws_ami                     = data.aws_ami.ubuntu[0].id
+  keypair                     = var.keypair
+  instance_type               = var.linux_instance_type
+  security_group_public_id    = aws_security_group.ec2-linux-west-vpc-sg[0].id
+  acl                         = var.acl
+  iam_instance_profile_id     = module.linux_iam_profile[0].id
+  userdata_rendered           = data.template_file.web_userdata_az2[0].rendered
+}
 
 #
 # Security Groups are VPC specific, so an "ALLOW ALL" for each VPC
@@ -225,7 +234,7 @@ module "west_instance_private_az1" {
 resource "aws_security_group" "ec2-linux-east-vpc-sg" {
   count                       = var.enable_linux_spoke_instances ? 1 : 0
   description                 = "Security Group for Linux Jump Box"
-  vpc_id                      = data.aws_vpc.vpc-east.id
+  vpc_id                      = data.aws_vpc.vpc-east[0].id
   ingress {
     description = "Allow SSH from Anywhere IPv4 (change this to My IP)"
     from_port = 22
@@ -279,7 +288,7 @@ resource "aws_security_group" "ec2-linux-east-vpc-sg" {
 resource "aws_security_group" "ec2-linux-west-vpc-sg" {
   count                       = var.enable_linux_spoke_instances ? 1 : 0
   description                 = "Security Group for Linux Jump Box"
-  vpc_id                      = data.aws_vpc.vpc-west.id
+  vpc_id                      = data.aws_vpc.vpc-west[0].id
   ingress {
     description = "Allow SSH from Anywhere IPv4 (change this to My IP)"
     from_port = 22
@@ -409,13 +418,13 @@ module "inspection_instance_jump_box" {
   availability_zone           = local.availability_zone_1
   public_subnet_id            = module.subnet-ns-inspection-public-az1.id
   public_ip_address           = local.linux_inspection_az1_public_ip_address
-  aws_ami                     = data.aws_ami.ubuntu.id
+  aws_ami                     = data.aws_ami.ubuntu[0].id
   keypair                     = var.keypair
   instance_type               = var.linux_instance_type
   security_group_public_id    = aws_security_group.ec2-linux-jump-box-sg[0].id
   acl                         = var.acl
   iam_instance_profile_id     = module.linux_iam_profile[0].id
-  userdata_rendered           = data.template_file.web_userdata_az1.rendered
+  userdata_rendered           = data.template_file.web_userdata_az1[0].rendered
 }
 
 #
@@ -441,6 +450,7 @@ data "template_file" "faz_userdata" {
 }
 
 data "aws_ami" "fortimanager" {
+  count                = var.enable_fortimanager ? 1 : 0
   most_recent = true
 
   filter {
@@ -457,6 +467,7 @@ data "aws_ami" "fortimanager" {
 }
 
 data "aws_ami" "fortianalyzer" {
+  count                = var.enable_fortianalyzer ? 1 : 0
   most_recent = true
 
   filter {
@@ -548,7 +559,7 @@ module "fortimanager" {
   public_subnet_id            = module.subnet-ns-inspection-public-az1.id
   enable_public_ips           = var.enable_fortimanager_public_ip
   public_ip_address           = local.fortimanager_ip_address
-  aws_ami                     = data.aws_ami.fortimanager.id
+  aws_ami                     = data.aws_ami.fortimanager[0].id
   keypair                     = var.keypair
   security_group_public_id    = aws_security_group.fortimanager_sg[0].id
   iam_instance_profile_id     = module.iam_profile[0].id
@@ -615,7 +626,7 @@ module "fortianalyzer" {
   instance_type               = var.fortianalyzer_instance_type
   public_subnet_id            = module.subnet-ns-inspection-public-az1.id
   public_ip_address           = local.fortianalyzer_ip_address
-  aws_ami                     = data.aws_ami.fortianalyzer.id
+  aws_ami                     = data.aws_ami.fortianalyzer[0].id
   enable_public_ips           = var.enable_fortianalyzer_public_ip
   keypair                     = var.keypair
   security_group_public_id    = aws_security_group.fortianalyzer_sg[0].id
