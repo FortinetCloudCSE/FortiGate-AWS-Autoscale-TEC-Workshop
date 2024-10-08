@@ -96,7 +96,7 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
         login_port    = "secgrp1"
         internal_port = "secgrp1"
       }
-      user_conf_file_path = "./ns_fgt_config.conf"
+      user_conf_file_path = var.ns_fgt_config_file
       # There are 3 options for providing user_conf data:
       # user_conf_content : FortiGate Configuration
       # user_conf_file_path : The file path of configuration file
@@ -119,7 +119,7 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
         login_port    = "secgrp1"
         internal_port = "secgrp1"
       }
-      user_conf_file_path = "./ns_fgt_config.conf"
+      user_conf_file_path = var.ns_fgt_config_file
       # There are 3 options for providing user_conf data:
       # user_conf_content : FortiGate Configuration
       # user_conf_file_path : The file path of configuration file

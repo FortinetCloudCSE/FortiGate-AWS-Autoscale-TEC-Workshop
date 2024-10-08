@@ -125,6 +125,16 @@ variable "ns_license_directory" {
   type        = string
   default     = ""
 }
+variable "ew_fgt_config_file" {
+  description = "Initial Config File for East/West Autoscale Group"
+  type        = string
+  default     = ""
+}
+variable "ns_fgt_config_file" {
+  description = "Initial Config File for North/South Autoscale Group"
+  type        = string
+  default     = ""
+}
 #
 # This boolean creates the resources a customer might have in an existing VPC. I don't have existing resources, so
 # this boolean will allow the creation of a TGW, VPC east, and VPC west. For testing only.
