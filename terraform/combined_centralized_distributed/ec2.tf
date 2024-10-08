@@ -617,7 +617,6 @@ resource aws_security_group "fortianalyzer_sg" {
   }
 }
 
-
 module "fortianalyzer" {
   source                      = "git::https://github.com/40netse/terraform-modules.git//aws_ec2_instance"
   count                       = var.enable_fortianalyzer ? 1 : 0

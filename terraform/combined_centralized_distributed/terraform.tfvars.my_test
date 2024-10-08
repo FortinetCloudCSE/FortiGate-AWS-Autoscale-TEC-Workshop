@@ -29,8 +29,8 @@ ns_module_prefix            = "ns"
 
 ew_license_directory        = "ew_license"
 ns_license_directory        = "ns_license"
-ew_config_file              = "./ew_fgt_config.conf"
-ns_config_file              = "./ns_fgt_config.conf"
+ew_fgt_config_file              = "./ew_fgt_config.conf"
+ns_fgt_config_file              = "./ns_fgt_config.conf"
 #
 # Allow creation of Linux instances in east/west VPCs
 #
@@ -45,7 +45,7 @@ enable_tgw_attachment_subnet   = true
 enable_tgw_attachment          = true
 enable_linux_spoke_instances   = true
 
-attach_to_tgw_name          = "mdw-etest-lab-tgw"
+attach_to_tgw_name          = "acme-test-tgw"
 endpoint_name_az1           = "ns-gwlbe_az1"
 endpoint_name_az2           = "ns-gwlbe_az2"
 ew_endpoint_name_az1        = "ew-gwlbe_az1"
@@ -54,11 +54,11 @@ ew_endpoint_name_az2        = "ew-gwlbe_az2"
 # cp (customer_prefix) and env (environment) prepended to all resources created by the template.
 # Used for identification. e.g. "<customer_prefix>-<prod/test/dev>"
 #
-cp                          = "mdw-etest"
-env                         = "lab"
+cp                          = "acme"
+env                         = "test"
 
 vpc_cidr_ns_inspection      = "10.88.0.0/21"
-vpc_cidr_ew_inspection      = "10.188.0.0/21"
+vpc_cidr_ew_inspection      = "10.88.8.0/21"
 vpc_cidr_jump_box           = "10.0.0.0/24"
 
 vpc_cidr_spoke              = "192.168.0.0/16"
