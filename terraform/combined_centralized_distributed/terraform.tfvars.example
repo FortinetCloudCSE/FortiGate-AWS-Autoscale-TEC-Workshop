@@ -72,7 +72,7 @@ enable_nat_gateway             = false
 enable_jump_box_public_ip      = false
 enable_fortimanager_public_ip  = false
 enable_fortianalyzer_public_ip = false
-enable_tgw_attachment_subnet   = false
+enable_tgw_attachment_subnet   = true
 enable_tgw_attachment          = true
 enable_linux_spoke_instances   = false
 
