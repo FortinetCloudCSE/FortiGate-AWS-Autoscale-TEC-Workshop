@@ -43,3 +43,7 @@ output "z_fortianalyzer_ip" {
   value = var.enable_fortianalyzer && var.enable_fortianalyzer_public_ip ? module.fortianalyzer[0].public_eip[0] : null
   description = "Fortianalyzer IP"
 }
+output "z_jump_box_ip" {
+  value = var.enable_jump_box && var.enable_jump_box_public_ip ? module.inspection_instance_jump_box[0].public_eip[0] : null
+  description = "Fortianalyzer IP"
+}
