@@ -15,6 +15,7 @@ package.json
 **/.terraform.lock.hcl
 **/*.lic
 **/*.zip
+**/terraform.tfvars
 **/.terraform.tfstate.lock.info
 **/terraform.tfstate
 **/terraform.tfstate.backup
