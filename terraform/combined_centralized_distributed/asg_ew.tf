@@ -85,6 +85,7 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
       template_name   = "fgt_asg_template"
       fgt_version     = "7.4.4"
       license_type    = "byol"
+      instance_type   = var.fgt_instance_type
       fgt_password    = var.fortigate_asg_password
       keypair_name    = var.keypair
       lic_folder_path = var.ew_license_directory
@@ -102,9 +103,9 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
       # user_conf_file_path : The file path of configuration file
       # user_conf_s3 : Map of AWS S3
 
-      asg_max_size = 1
-      asg_min_size = 1
-      asg_desired_capacity = 1
+      asg_max_size          = var.ew_byol_asg_max_size
+      asg_min_size          = var.ew_byol_asg_min_size
+      asg_desired_capacity  = var.ew_byol_asg_desired_size
       create_dynamodb_table = true
       dynamodb_table_name   = "fgt_asg_track_table"
     },
@@ -112,8 +113,9 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
       template_name               = "fgt_asg_template_on_demand"
       fgt_version                 = "7.4.4"
       license_type                = "on_demand"
-      fgt_password    = var.fortigate_asg_password
-      keypair_name    = var.keypair
+      instance_type               = var.fgt_instance_type
+      fgt_password                = var.fortigate_asg_password
+      keypair_name                = var.keypair
       enable_fgt_system_autoscale = true
       intf_security_group = {
         login_port    = "secgrp1"
@@ -124,9 +126,9 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
       # user_conf_content : FortiGate Configuration
       # user_conf_file_path : The file path of configuration file
       # user_conf_s3 : Map of AWS S3
-      asg_max_size = 2
-      asg_min_size = 0
-      # asg_desired_capacity = 0
+      asg_max_size          = var.ew_ondemand_asg_max_size
+      asg_min_size          = var.ew_ondemand_asg_min_size
+      asg_desired_capacity  = var.ew_ondemand_asg_desired_size
       dynamodb_table_name = "fgt_asg_track_table"
       scale_policies = {
         byol_cpu_above_80 = {

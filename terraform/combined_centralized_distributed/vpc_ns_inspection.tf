@@ -77,7 +77,7 @@ data "aws_vpc_endpoint" "asg_endpoint_az1" {
   depends_on = [module.spk_tgw_gwlb_asg_fgt_igw]
   filter {
     name   = "tag:Name"
-    values = [var.endpoint_name_az1]
+    values = [var.ns_endpoint_name_az1]
   }
 }
 
@@ -85,7 +85,7 @@ data "aws_vpc_endpoint" "asg_endpoint_az2" {
   depends_on = [module.spk_tgw_gwlb_asg_fgt_igw]
   filter {
     name   = "tag:Name"
-    values = [var.endpoint_name_az2]
+    values = [var.ns_endpoint_name_az2]
   }
 }
 
