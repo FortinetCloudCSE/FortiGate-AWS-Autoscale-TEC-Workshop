@@ -75,15 +75,15 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
 
   ## Transit Gateway
   tgw_name        = "${var.cp}-${var.env}-tgw"
-  tgw_description = "tgw for fortigate autoscaale group"
+  tgw_description = "tgw for fortigate autoscale group"
 
   ## Auto scale group
-  # This example is a hybird license ASG
+  # This example is a hybrid license ASG
   fgt_intf_mode = "2-arm"
   asgs = {
     fgt_byol_asg = {
       template_name   = "fgt_asg_template"
-      fgt_version     = "7.4.4"
+      fgt_version     = var.fortios_version
       license_type    = "byol"
       instance_type   = var.fgt_instance_type
       fgt_password    = var.fortigate_asg_password
@@ -110,7 +110,7 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
     },
     fgt_on_demand_asg = {
       template_name               = "fgt_asg_template_on_demand"
-      fgt_version                 = "7.4.4"
+      fgt_version                 = var.fortios_version
       license_type                = "on_demand"
       instance_type               = var.fgt_instance_type
       fgt_password                = var.fortigate_asg_password
@@ -240,7 +240,7 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
   }
 
   ## Gateway Load Balancer
-  enable_cross_zone_load_balancing = true
+  enable_cross_zone_load_balancing = var.allow_cross_zone_load_balancing
 
   ## Spoke VPC
   enable_east_west_inspection = true

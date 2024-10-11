@@ -434,7 +434,7 @@ data "template_file" "fmgr_userdata" {
   count                = var.enable_fortimanager ? 1 : 0
   template             = file("./config_templates/fmgr-userdata.tpl")
   vars = {
-    fmgr_byol_license  = var.enable_fortimanager ? ("./licenses/fmgr-license.lic") : ""
+    fmgr_byol_license  = var.enable_fortimanager ? (var.fortimanager_license_file) : ""
   }
 }
 
@@ -445,7 +445,7 @@ data "template_file" "faz_userdata" {
   count                = var.enable_fortianalyzer ? 1 : 0
   template = file("./config_templates/faz-userdata.tpl")
   vars = {
-    faz_byol_license      = var.enable_fortianalyzer ? ("./licenses/faz-license.lic") : ""
+    faz_byol_license      = var.enable_fortianalyzer ? (var.fortianalyzer_license_file) : ""
   }
 }
 

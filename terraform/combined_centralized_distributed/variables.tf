@@ -98,8 +98,17 @@ variable "fgt_instance_type" {
   type        = string
   default     = ""
 }
+variable "fortios_version" {
+  description = "FortiGate OS Version of all instances in the Autoscale Groups"
+  type        = string
+  default     = ""
+}
 variable "enable_tgw_attachment_subnet" {
   description = "Boolean to allow creation of TGW Attachment subnet in each AZ of Inspection VPC"
+  type        = bool
+}
+variable "allow_cross_zone_load_balancing" {
+  description = "Allow gateway load balancer to use healthy instances in a different zone"
   type        = bool
 }
 variable "enable_tgw_attachment" {
@@ -127,6 +136,16 @@ variable "ew_license_directory" {
 }
 variable "ns_license_directory" {
   description = "License Directory for North/South Autoscale Group"
+  type        = string
+  default     = ""
+}
+variable "fortimanager_license_file" {
+  description = "Full path for FortiManager License"
+  type        = string
+  default     = ""
+}
+variable "fortianalyzer_license_file" {
+  description = "Full path for FortiAnalyzer License"
   type        = string
   default     = ""
 }
