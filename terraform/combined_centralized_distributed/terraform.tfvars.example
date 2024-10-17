@@ -20,6 +20,7 @@ public_subnet_index         = 0
 gwlbe_subnet_index          = 1
 private_subnet_index        = 2
 tgw_subnet_index            = 3
+jump_box_subnet_index       = 4
 
 #
 # cp (customer_prefix) and env (environment) prepended to all resources created by the template.

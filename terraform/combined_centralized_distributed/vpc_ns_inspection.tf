@@ -52,6 +52,9 @@ locals {
   tgw_subnet_cidr_az1 = cidrsubnet(var.vpc_cidr_ns_inspection, var.subnet_bits, var.tgw_subnet_index)
 }
 locals {
+  jump_subnet_cidr_az1 = cidrsubnet(var.vpc_cidr_ns_inspection, var.subnet_bits, var.jump_subnet_index + local.subnet_index_addend)
+}
+locals {
   tgw_subnet_cidr_az2 = cidrsubnet(var.vpc_cidr_ns_inspection, var.subnet_bits, var.tgw_subnet_index + local.subnet_index_addend)
 }
 locals {
@@ -221,6 +224,30 @@ module "inspection-tgw-route-table-association-az1" {
   route_table_id             = module.inspection-tgw-route-table-az1[0].id
 }
 
+
+module "subnet-ns-inspection-jump-az1" {
+  source                     = "git::https://github.com/40netse/terraform-modules.git//aws_subnet"
+  count                      = var.enable_jump_box ? 1 : 0
+  subnet_name                = "${var.cp}-${var.env}-ns-inspection-jump-subnet-az1"
+
+  vpc_id                     = module.vpc-ns-inspection.vpc_id
+  availability_zone          = local.availability_zone_1
+  subnet_cidr                = local.jump_subnet_cidr_az1
+}
+
+module "inspection-jump-route-table-az1" {
+  source  = "git::https://github.com/40netse/terraform-modules.git//aws_route_table"
+  count   = var.enable_jump_box ? 1 : 0
+  rt_name = "${var.cp}-${var.env}-ns-inspection-jump-rt-az1"
+
+  vpc_id                     = module.vpc-ns-inspection.vpc_id
+}
+module "inspection-jump-route-table-association-az1" {
+  source                     = "git::https://github.com/40netse/terraform-modules.git//aws_route_table_association"
+  count                      = var.enable_jump_box ? 1 : 0
+  subnet_ids                 = module.subnet-ns-inspection-jump-az1[0].id
+  route_table_id             = module.inspection-jump-route-table-az1[0].id
+}
 #
 # Security VPC Transit Gateway Attachment, Route Table and Routes
 #
@@ -369,6 +396,34 @@ resource "aws_default_route_table" "route_inspection" {
 # Routes for the route table. If nat gateway is enabled, make the default route go to the nat gateway.
 # If not, make the default route go to the internet gateway.
 #
+resource "aws_route" "inspection-ns-jump-default-route-igw-az1" {
+  depends_on             = [module.vpc-igw-ns-inspection]
+  count                  = var.enable_jump_box ? 1 : 0
+  route_table_id         = module.inspection-jump-route-table-az1[0].id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = module.vpc-igw-ns-inspection.igw_id
+}
+resource "aws_route" "inspection-ns-jump-192-route-igw-az1" {
+  depends_on             = [time_sleep.wait_5_minutes]
+  count                  = var.enable_jump_box ? 1 : 0
+  route_table_id         = module.inspection-jump-route-table-az1[0].id
+  destination_cidr_block = local.rfc1918_192
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "inspection-ns-jump-10-route-igw-az1" {
+  depends_on             = [time_sleep.wait_5_minutes]
+  count                  = var.enable_jump_box ? 1 : 0
+  route_table_id         = module.inspection-jump-route-table-az1[0].id
+  destination_cidr_block = local.rfc1918_10
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "inspection-ns-jump-172-route-igw-az1" {
+  depends_on             = [time_sleep.wait_5_minutes]
+  count                  = var.enable_jump_box ? 1 : 0
+  route_table_id         = module.inspection-jump-route-table-az1[0].id
+  destination_cidr_block = local.rfc1918_172
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
 resource "aws_route" "inspection-ns-public-default-route-ngw-az1" {
   depends_on             = [aws_nat_gateway.vpc-ns-inspection-az1]
   count                  = var.enable_nat_gateway ? 1 : 0

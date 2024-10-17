@@ -89,56 +89,50 @@ data "aws_ec2_transit_gateway_route_table" "tgw-route-table-west" {
   }
 }
 resource "aws_ec2_transit_gateway_route" "tgw_ns_inspection_route_to_east" {
-  count                = var.enable_linux_spoke_instances ? 1 : 0
+  count                          = var.enable_linux_spoke_instances ? 1 : 0
   destination_cidr_block         = var.vpc_cidr_east
   transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_vpc_attachment.tgw-attachment-east[0].id
   transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.tgw-route-table-ns-inspection.id
 }
 resource "aws_ec2_transit_gateway_route" "tgw_ns_inspection_route_to_west" {
-  count                = var.enable_linux_spoke_instances ? 1 : 0
+  count                          = var.enable_linux_spoke_instances ? 1 : 0
   destination_cidr_block         = var.vpc_cidr_west
   transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_vpc_attachment.tgw-attachment-west[0].id
   transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.tgw-route-table-ns-inspection.id
 }
 resource "aws_ec2_transit_gateway_route" "tgw_ew_inspection_route_to_east" {
-  count                = var.enable_linux_spoke_instances ? 1 : 0
+  count                          = var.enable_linux_spoke_instances ? 1 : 0
   destination_cidr_block         = var.vpc_cidr_east
   transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_vpc_attachment.tgw-attachment-east[0].id
   transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.tgw-route-table-ew-inspection.id
 }
 resource "aws_ec2_transit_gateway_route" "tgw_ew_inspection_route_to_west" {
-  count                = var.enable_linux_spoke_instances ? 1 : 0
+  count                          = var.enable_linux_spoke_instances ? 1 : 0
   destination_cidr_block         = var.vpc_cidr_west
   transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_vpc_attachment.tgw-attachment-west[0].id
   transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.tgw-route-table-ew-inspection.id
 }
 resource "aws_ec2_transit_gateway_route" "tgw_east" {
-  count                = var.enable_linux_spoke_instances ? 1 : 0
+  count                          = var.enable_linux_spoke_instances ? 1 : 0
   destination_cidr_block         = "0.0.0.0/0"
   transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_vpc_attachment.tgw-attachment-ns-inspection.id
   transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.tgw-route-table-east[0].id
 }
 resource "aws_ec2_transit_gateway_route" "tgw_east_west" {
-  count                = var.enable_linux_spoke_instances ? 1 : 0
+  count                          = var.enable_linux_spoke_instances ? 1 : 0
   destination_cidr_block         = "192.168.1.0/24"
   transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_vpc_attachment.tgw-attachment-ew-inspection.id
   transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.tgw-route-table-east[0].id
 }
 resource "aws_ec2_transit_gateway_route" "tgw_west_east" {
-  count                = var.enable_linux_spoke_instances ? 1 : 0
+  count                          = var.enable_linux_spoke_instances ? 1 : 0
   destination_cidr_block         = "192.168.0.0/24"
   transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_vpc_attachment.tgw-attachment-ew-inspection.id
   transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.tgw-route-table-west[0].id
 }
 resource "aws_ec2_transit_gateway_route" "tgw_west" {
-  count                = var.enable_linux_spoke_instances ? 1 : 0
+  count                          = var.enable_linux_spoke_instances ? 1 : 0
   destination_cidr_block         = "0.0.0.0/0"
   transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_vpc_attachment.tgw-attachment-ns-inspection.id
   transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.tgw-route-table-west[0].id
-}
-resource "aws_route" "specific_route_to_ec2" {
-  count                = var.enable_linux_spoke_instances ? 1 : 0
-  route_table_id = module.inspection-public-route-table-az1.id
-  destination_cidr_block = "192.168.0.11/32"
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }

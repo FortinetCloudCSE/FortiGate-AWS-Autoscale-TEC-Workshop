@@ -26,6 +26,10 @@ variable "tgw_subnet_index" {
   description = "Index of the Transit Gateway Attachment subnet"
   default = 3
 }
+variable "jump_subnet_index" {
+  description = "Index of the Jump Box subnet"
+  default = 4
+}
 variable "keypair" {
   description = "Keypair for instances that support keypairs"
 }

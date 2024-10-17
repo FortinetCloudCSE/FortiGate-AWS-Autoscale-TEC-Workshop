@@ -1,6 +1,6 @@
 
 locals {
-  linux_inspection_az1_public_ip_address = cidrhost(local.public_subnet_cidr_az1, var.linux_host_ip)
+  linux_inspection_az1_jump_ip_address = cidrhost(local.jump_subnet_cidr_az1, var.linux_host_ip)
 }
 
 locals {
@@ -233,7 +233,7 @@ module "west_instance_private_az2" {
 #
 resource "aws_security_group" "ec2-linux-east-vpc-sg" {
   count                       = var.enable_linux_spoke_instances ? 1 : 0
-  description                 = "Security Group for Linux Jump Box"
+  description                 = "Security Group for Linux Instances in the East Spoke VPC"
   vpc_id                      = data.aws_vpc.vpc-east[0].id
   ingress {
     description = "Allow SSH from Anywhere IPv4 (change this to My IP)"
@@ -287,7 +287,7 @@ resource "aws_security_group" "ec2-linux-east-vpc-sg" {
 }
 resource "aws_security_group" "ec2-linux-west-vpc-sg" {
   count                       = var.enable_linux_spoke_instances ? 1 : 0
-  description                 = "Security Group for Linux Jump Box"
+  description                 = "Security Group for Linux Instances in the West Spoke VPC"
   vpc_id                      = data.aws_vpc.vpc-west[0].id
   ingress {
     description = "Allow SSH from Anywhere IPv4 (change this to My IP)"
@@ -416,8 +416,8 @@ module "inspection_instance_jump_box" {
   aws_ec2_instance_name       = "${var.cp}-${var.env}-ns-inspection-jump-box-instance"
   enable_public_ips           = var.enable_jump_box_public_ip
   availability_zone           = local.availability_zone_1
-  public_subnet_id            = module.subnet-ns-inspection-public-az1.id
-  public_ip_address           = local.linux_inspection_az1_public_ip_address
+  public_subnet_id            = module.subnet-ns-inspection-jump-az1[0].id
+  public_ip_address           = local.linux_inspection_az1_jump_ip_address
   aws_ami                     = data.aws_ami.ubuntu[0].id
   keypair                     = var.keypair
   instance_type               = var.linux_instance_type
