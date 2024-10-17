@@ -12,6 +12,11 @@ provider "aws" {
 }
 
 locals {
+  enable_jump_subnet = ((var.enable_jump_box == true) ||
+                       (var.enable_fortimanager == true) ||
+                       (var.enable_fortianalyzer == true)) ? true : false
+}
+locals {
   rfc1918_192 = "192.168.0.0/16"
 }
 locals {
@@ -227,7 +232,7 @@ module "inspection-tgw-route-table-association-az1" {
 
 module "subnet-ns-inspection-jump-az1" {
   source                     = "git::https://github.com/40netse/terraform-modules.git//aws_subnet"
-  count                      = var.enable_jump_box ? 1 : 0
+  count                      = local.enable_jump_subnet ? 1 : 0
   subnet_name                = "${var.cp}-${var.env}-ns-inspection-jump-subnet-az1"
 
   vpc_id                     = module.vpc-ns-inspection.vpc_id
@@ -237,14 +242,14 @@ module "subnet-ns-inspection-jump-az1" {
 
 module "inspection-jump-route-table-az1" {
   source  = "git::https://github.com/40netse/terraform-modules.git//aws_route_table"
-  count   = var.enable_jump_box ? 1 : 0
+  count   = local.enable_jump_subnet ? 1 : 0
   rt_name = "${var.cp}-${var.env}-ns-inspection-jump-rt-az1"
 
   vpc_id                     = module.vpc-ns-inspection.vpc_id
 }
 module "inspection-jump-route-table-association-az1" {
   source                     = "git::https://github.com/40netse/terraform-modules.git//aws_route_table_association"
-  count                      = var.enable_jump_box ? 1 : 0
+  count                      = local.enable_jump_subnet ? 1 : 0
   subnet_ids                 = module.subnet-ns-inspection-jump-az1[0].id
   route_table_id             = module.inspection-jump-route-table-az1[0].id
 }
@@ -398,28 +403,28 @@ resource "aws_default_route_table" "route_inspection" {
 #
 resource "aws_route" "inspection-ns-jump-default-route-igw-az1" {
   depends_on             = [module.vpc-igw-ns-inspection]
-  count                  = var.enable_jump_box ? 1 : 0
+  count                  = local.enable_jump_subnet ? 1 : 0
   route_table_id         = module.inspection-jump-route-table-az1[0].id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = module.vpc-igw-ns-inspection.igw_id
 }
 resource "aws_route" "inspection-ns-jump-192-route-igw-az1" {
   depends_on             = [time_sleep.wait_5_minutes]
-  count                  = var.enable_jump_box ? 1 : 0
+  count                  = local.enable_jump_subnet ? 1 : 0
   route_table_id         = module.inspection-jump-route-table-az1[0].id
   destination_cidr_block = local.rfc1918_192
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ns-jump-10-route-igw-az1" {
   depends_on             = [time_sleep.wait_5_minutes]
-  count                  = var.enable_jump_box ? 1 : 0
+  count                  = local.enable_jump_subnet ? 1 : 0
   route_table_id         = module.inspection-jump-route-table-az1[0].id
   destination_cidr_block = local.rfc1918_10
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "inspection-ns-jump-172-route-igw-az1" {
   depends_on             = [time_sleep.wait_5_minutes]
-  count                  = var.enable_jump_box ? 1 : 0
+  count                  = local.enable_jump_subnet ? 1 : 0
   route_table_id         = module.inspection-jump-route-table-az1[0].id
   destination_cidr_block = local.rfc1918_172
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id

@@ -4,10 +4,10 @@ locals {
 }
 
 locals {
-  fortimanager_ip_address = cidrhost(local.public_subnet_cidr_az1, var.fortimanager_host_ip)
+  fortimanager_ip_address = cidrhost(local.jump_subnet_cidr_az1, var.fortimanager_host_ip)
 }
 locals {
-  fortianalyzer_ip_address = cidrhost(local.public_subnet_cidr_az1, var.fortianalyzer_host_ip)
+  fortianalyzer_ip_address = cidrhost(local.jump_subnet_cidr_az1, var.fortianalyzer_host_ip)
 }
 locals {
   linux_east_az1_ip_address = cidrhost(var.vpc_cidr_east_private_az1, var.linux_host_ip)
@@ -556,7 +556,7 @@ module "fortimanager" {
   aws_ec2_instance_name       = "${var.cp}-${var.env}-Fortimanager"
   availability_zone           = local.availability_zone_1
   instance_type               = var.fortimanager_instance_type
-  public_subnet_id            = module.subnet-ns-inspection-public-az1.id
+  public_subnet_id            = module.subnet-ns-inspection-jump-az1[0].id
   enable_public_ips           = var.enable_fortimanager_public_ip
   public_ip_address           = local.fortimanager_ip_address
   aws_ami                     = data.aws_ami.fortimanager[0].id
@@ -623,7 +623,7 @@ module "fortianalyzer" {
   aws_ec2_instance_name       = "${var.cp}-${var.env}-Fortianalyzer"
   availability_zone           = local.availability_zone_1
   instance_type               = var.fortianalyzer_instance_type
-  public_subnet_id            = module.subnet-ns-inspection-public-az1.id
+  public_subnet_id            = module.subnet-ns-inspection-jump-az1[0].id
   public_ip_address           = local.fortianalyzer_ip_address
   aws_ami                     = data.aws_ami.fortianalyzer[0].id
   enable_public_ips           = var.enable_fortianalyzer_public_ip
