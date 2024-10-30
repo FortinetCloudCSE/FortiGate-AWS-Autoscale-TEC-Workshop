@@ -66,6 +66,25 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
         }
       }
     }
+    management_secgrp1 = {
+      description = "Security group by Terraform for dedicated management port"
+      ingress = {
+        all_traffic = {
+          from_port = "0"
+          to_port   = "0"
+          protocol  = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+      egress = {
+        all_traffic = {
+          from_port = "0"
+          to_port   = "0"
+          protocol  = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
   }
 
   vpc_cidr_block     = var.vpc_cidr_ew_inspection
@@ -94,7 +113,7 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
       # fortiflex_configid_list = "<YOUR-OWN-VALUE>" # e.g. [2343]
       enable_fgt_system_autoscale = true
       intf_security_group = {
-        login_port    = "secgrp1"
+        login_port    = "management_secgrp1"
         internal_port = "secgrp1"
       }
       user_conf_file_path = var.ew_fgt_config_file
@@ -118,7 +137,7 @@ module "spk_tgw_gwlb_asg_fgt_igw_ew" {
       keypair_name                = var.keypair
       enable_fgt_system_autoscale = true
       intf_security_group = {
-        login_port    = "secgrp1"
+        login_port    = "management_secgrp1"
         internal_port = "secgrp1"
       }
       user_conf_file_path = var.ew_fgt_config_file
