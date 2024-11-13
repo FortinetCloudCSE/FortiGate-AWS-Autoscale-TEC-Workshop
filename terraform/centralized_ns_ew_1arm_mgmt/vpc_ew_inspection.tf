@@ -47,27 +47,6 @@ module "ew-vpc-igw-inspection" {
   igw_name                   = "${var.cp}-${var.env}-ew-inspection-igw"
   vpc_id                     = module.ew-vpc-inspection.vpc_id
 }
-resource "aws_eip" "ew-nat-gateway-inspection-az1" {
-}
-
-resource "aws_eip" "ew-nat-gateway-inspection-az2" {
-}
-
-resource "aws_nat_gateway" "ew-vpc-inspection-az1" {
-  allocation_id     = aws_eip.ew-nat-gateway-inspection-az1.id
-  subnet_id         = module.ew-subnet-inspection-public-az1.id
-  tags = {
-    Name = "${var.cp}-${var.env}-nat-gw-ew-az1"
-  }
-}
-
-resource "aws_nat_gateway" "ew-vpc-inspection-az2" {
-  allocation_id     = aws_eip.ew-nat-gateway-inspection-az2.id
-  subnet_id         = module.ew-subnet-inspection-public-az2.id
-  tags = {
-    Name = "${var.cp}-${var.env}-nat-gw-ew-az2"
-  }
-}
 
 #
 # AZ 1
@@ -258,21 +237,6 @@ resource "aws_route" "ew-inspection-public-default-route-ngw-az2" {
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = module.ew-vpc-igw-inspection.igw_id
 }
-#
-# gwlbe subnet routes
-#
-# resource "aws_route" "inspection-ew-gwlbe-default-route-igw-az1" {
-#   depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
-#   route_table_id         = module.ew-inspection-gwlbe-route-table-az1.id
-#   destination_cidr_block = "0.0.0.0/0"
-#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-# }
-# resource "aws_route" "inspection-ew-gwlbe-default-route-igw-az2" {
-#   depends_on             = [module.existing_resources, time_sleep.wait_5_minutes]
-#   route_table_id         = module.ew-inspection-gwlbe-route-table-az2.id
-#   destination_cidr_block = "0.0.0.0/0"
-#   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-# }
 
 resource "aws_route" "inspection-ew-gwlbe-192-route-igw-az1" {
   depends_on             = [time_sleep.wait_5_minutes]

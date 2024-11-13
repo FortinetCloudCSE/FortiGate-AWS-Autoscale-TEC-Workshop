@@ -10,7 +10,15 @@ provider "aws" {
     tags = local.common_tags
   }
 }
-
+terraform {
+  required_providers {
+    template = {
+      source  = "registry.terraform.io/hashicorp/template"
+      version = "2.2.0"
+    }
+  }
+  # Other parameters...
+}
 locals {
   enable_jump_subnet = ((var.enable_jump_box == true) ||
                        (var.enable_fortimanager == true) ||
@@ -457,16 +465,18 @@ resource "aws_route" "inspection-ns-gwlbe-default-route-natgw-az2" {
   nat_gateway_id         = aws_nat_gateway.vpc-ns-inspection-az2[0].id
 }
 resource "aws_route" "inspection-ns-gwlbe-default-route-igw-az1" {
+  depends_on             = [module.vpc-igw-ns-inspection]
   count                  = !var.enable_nat_gateway ? 1 : 0
   route_table_id         = module.inspection-gwlbe-route-table-az1.id
   destination_cidr_block = "0.0.0.0/0"
-  transit_gateway_id     = module.ew-vpc-igw-inspection.igw_id
+  gateway_id     = module.vpc-igw-ns-inspection.igw_id
 }
 resource "aws_route" "inspection-ns-gwlbe-default-route-igw-az2" {
+  depends_on             = [module.vpc-igw-ns-inspection]
   count                  = !var.enable_nat_gateway ? 1 : 0
   route_table_id         = module.inspection-gwlbe-route-table-az2.id
   destination_cidr_block = "0.0.0.0/0"
-  transit_gateway_id     = module.ew-vpc-igw-inspection.igw_id
+  gateway_id     = module.vpc-igw-ns-inspection.igw_id
 }
 resource "aws_route" "inspection-ns-gwlbe-192-route-igw-az1" {
   depends_on             = [time_sleep.wait_5_minutes]
