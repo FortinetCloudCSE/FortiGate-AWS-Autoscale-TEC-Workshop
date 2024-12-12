@@ -11,16 +11,6 @@ resource "random_string" "random" {
   length           = 5
   special          = false
 }
-data "aws_ec2_transit_gateway" "tgw" {
-  filter {
-    name   = "tag:Name"
-    values = [var.attach_to_tgw_name]
-  }
-  filter {
-    name   = "state"
-    values = ["available"]
-  }
-}
 
 module "vpc-management" {
   source                         = "git::https://github.com/40netse/terraform-modules.git//aws_management_vpc"
@@ -71,44 +61,44 @@ resource "aws_route" "management-public-default-route-igw-az2" {
 
 resource "aws_route" "public-192-route-tgw-az1" {
   depends_on             = [module.vpc-management]
-  route_table_id         = module.vpc-management[0].subnet_management_public_az1_id
+  route_table_id         = module.vpc-management[0].route_table_management_public_az1_id
   destination_cidr_block = local.rfc1918_192
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+  transit_gateway_id     = module.vpc-transit-gateway.tgw_id
 }
 resource "aws_route" "public-192-route-tgw-az2" {
   depends_on             = [module.vpc-management]
   count                 = var.enable_management_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-management[0].subnet_management_public_az2_id
+  route_table_id         = module.vpc-management[0].route_table_management_public_az2_id
   destination_cidr_block = local.rfc1918_192
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+  transit_gateway_id     = module.vpc-transit-gateway.tgw_id
 }
 resource "aws_route" "public-10-route-tgw-az1" {
   depends_on             = [module.vpc-management]
   count                  = var.enable_management_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-management[0].subnet_management_public_az1_id
+  route_table_id         = module.vpc-management[0].route_table_management_public_az1_id
   destination_cidr_block = local.rfc1918_10
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+  transit_gateway_id     = module.vpc-transit-gateway.tgw_id
 }
 resource "aws_route" "public-10-route-tgw-az2" {
   depends_on             = [module.vpc-management]
   count                 = var.enable_management_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-management[0].subnet_management_public_az2_id
+  route_table_id         = module.vpc-management[0].route_table_management_public_az2_id
   destination_cidr_block = local.rfc1918_10
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+  transit_gateway_id     = module.vpc-transit-gateway.tgw_id
 }
 resource "aws_route" "public-172-route-tgw-az1" {
   depends_on             = [module.vpc-management]
   count                  = var.enable_management_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-management[0].subnet_management_public_az1_id
+  route_table_id         = module.vpc-management[0].route_table_management_public_az1_id
   destination_cidr_block = local.rfc1918_172
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+  transit_gateway_id     = module.vpc-transit-gateway.tgw_id
 }
 resource "aws_route" "public-172-route-tgw-az2" {
   depends_on             = [module.vpc-management]
   count                  = var.enable_management_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-management[0].subnet_management_public_az2_id
+  route_table_id         = module.vpc-management[0].route_table_management_public_az2_id
   destination_cidr_block = local.rfc1918_172
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+  transit_gateway_id     = module.vpc-transit-gateway.tgw_id
 }
 resource "aws_ec2_transit_gateway_route" "route-to-west-tgw" {
   count                          = var.enable_build_existing_subnets ? 1 : 0
