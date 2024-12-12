@@ -111,4 +111,16 @@ resource "aws_ec2_transit_gateway_route" "route-east-default-tgw" {
   transit_gateway_attachment_id  = module.vpc-transit-gateway-attachment-east[0].tgw_attachment_id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.east[0].id
 }
+resource "aws_route" "management-route-east-public-az1" {
+  count                  = var.enable_build_management_vpc ? 1 : 0
+  route_table_id         = module.route-table-east-public-az1[0].id
+  destination_cidr_block = var.vpc_cidr_management
+  transit_gateway_id     = module.vpc-transit-gateway.tgw_id
+}
+resource "aws_route" "management-route-east-public-az2" {
+  count                  = var.enable_build_management_vpc ? 1 : 0
+  route_table_id         = module.route-table-east-public-az2[0].id
+  destination_cidr_block = var.vpc_cidr_management
+  transit_gateway_id     = module.vpc-transit-gateway.tgw_id
+}
 

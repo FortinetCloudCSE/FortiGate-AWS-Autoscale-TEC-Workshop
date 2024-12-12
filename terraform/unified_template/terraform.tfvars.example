@@ -24,14 +24,6 @@ keypair                     = ""
 my_ip                       = ""
 
 #
-# Keypair is a account/region specific resource used to login to the instances.
-#
-# my_ip is used to restrict security groups to only allow traffic from your IP.
-#
-keypair                     = ""
-my_ip                       = ""
-
-#
 # defines how the fortigates in the autoscale group will access the internet. "nat_gw" or "eip"
 # nat_gw will create a NAT Gateway in the public subnet of the inspection VPC and point the route tables to the NAT Gateway
 # eip will assign an Elastic IP to the Fortigate instances in the autoscale group and point the route tables to the IGW
@@ -71,7 +63,9 @@ allow_cross_zone_load_balancing = true
 
 #
 # allow the creation of a dedicated management vpc from this template. Its better to do this from existing_vpc_resources template
-# so the management instances are not destroyed by this template
+# so the management instances are not destroyed by this template.
+#
+# NOTE: You should keep this false if you deployed the management vpc from the existing_vpc_resources template.
 #
 enable_dedicated_management_vpc = false
 
@@ -105,14 +99,6 @@ ns_byol_asg_desired_size     = 1
 ns_ondemand_asg_min_size     = 0
 ns_ondemand_asg_max_size     = 2
 ns_ondemand_asg_desired_size = 0
-
-ew_byol_asg_min_size         = 1
-ew_byol_asg_max_size         = 2
-ew_byol_asg_desired_size     = 1
-
-ew_ondemand_asg_min_size     = 0
-ew_ondemand_asg_max_size     = 2
-ew_ondemand_asg_desired_size = 0
 
 #
 # Fortigate Autoscale Variables

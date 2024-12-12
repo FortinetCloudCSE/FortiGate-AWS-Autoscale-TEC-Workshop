@@ -88,3 +88,15 @@ resource "aws_ec2_transit_gateway_route" "route-west-default-tgw" {
   transit_gateway_attachment_id  = module.vpc-transit-gateway-attachment-west[0].tgw_attachment_id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.west[0].id
 }
+resource "aws_route" "management-route-west-public-az1" {
+  count                  = var.enable_build_management_vpc ? 1 : 0
+  route_table_id         = module.route-table-west-public-az1[0].id
+  destination_cidr_block = var.vpc_cidr_management
+  transit_gateway_id     = module.vpc-transit-gateway.tgw_id
+}
+resource "aws_route" "management-route-west-public-az2" {
+  count                  = var.enable_build_management_vpc ? 1 : 0
+  route_table_id         = module.route-table-west-public-az2[0].id
+  destination_cidr_block = var.vpc_cidr_management
+  transit_gateway_id     = module.vpc-transit-gateway.tgw_id
+}

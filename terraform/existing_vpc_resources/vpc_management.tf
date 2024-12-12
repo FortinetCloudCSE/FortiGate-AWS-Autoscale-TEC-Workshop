@@ -1,6 +1,25 @@
+locals {
+  rfc1918_192 = "192.168.0.0/16"
+}
+locals {
+  rfc1918_10 = "10.0.0.0/8"
+}
+locals {
+  rfc1918_172 = "172.16.0.0/12"
+}
 resource "random_string" "random" {
   length           = 5
   special          = false
+}
+data "aws_ec2_transit_gateway" "tgw" {
+  filter {
+    name   = "tag:Name"
+    values = [var.attach_to_tgw_name]
+  }
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
 }
 
 module "vpc-management" {
@@ -33,6 +52,63 @@ module "vpc-management" {
   linux_host_ip                  = var.linux_host_ip
   linux_instance_type            = var.linux_instance_type
   my_ip                          = var.my_ip
+}
+resource "aws_route" "management-public-default-route-igw-az1" {
+  depends_on             = [module.vpc-management]
+  route_table_id         = module.vpc-management[0].route_table_management_public_az1_id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = module.vpc-management[0].igw_id
+}
+resource "aws_route" "management-public-default-route-igw-az2" {
+  depends_on             = [module.vpc-management]
+  route_table_id         = module.vpc-management[0].route_table_management_public_az2_id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = module.vpc-management[0].igw_id
+}
+#
+# This is a bit bruce force. Route all the rfc-1918 space to the TGW. More specific route will handle the local traffic.
+#
+
+resource "aws_route" "public-192-route-tgw-az1" {
+  depends_on             = [module.vpc-management]
+  route_table_id         = module.vpc-management.subnet_management_public_az1_id
+  destination_cidr_block = local.rfc1918_192
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "public-192-route-tgw-az2" {
+  depends_on             = [module.vpc-management]
+  count                 = var.enable_tgw_attachment ? 1 : 0
+  route_table_id         = module.vpc-management.subnet_management_public_az2_id
+  destination_cidr_block = local.rfc1918_192
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "public-10-route-tgw-az1" {
+  depends_on             = [module.vpc-management]
+  count                  = var.enable_tgw_attachment ? 1 : 0
+  route_table_id         = module.vpc-management.subnet_management_public_az1_id
+  destination_cidr_block = local.rfc1918_10
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "public-10-route-tgw-az2" {
+  depends_on             = [module.vpc-management]
+  count                 = var.enable_tgw_attachment ? 1 : 0
+  route_table_id         = module.vpc-management.subnet_management_public_az2_id
+  destination_cidr_block = local.rfc1918_10
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "public-172-route-tgw-az1" {
+  depends_on             = [module.vpc-management]
+  count                  = var.enable_tgw_attachment ? 1 : 0
+  route_table_id         = module.vpc-management.subnet_management_public_az1_id
+  destination_cidr_block = local.rfc1918_172
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+}
+resource "aws_route" "public-172-route-tgw-az2" {
+  depends_on             = [module.vpc-management]
+  count                  = var.enable_tgw_attachment ? 1 : 0
+  route_table_id         = module.vpc-management.subnet_management_public_az2_id
+  destination_cidr_block = local.rfc1918_172
+  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_ec2_transit_gateway_route" "route-to-west-tgw" {
   count                          = var.enable_build_existing_subnets ? 1 : 0
