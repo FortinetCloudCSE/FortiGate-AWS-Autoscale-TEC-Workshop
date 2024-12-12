@@ -1,0 +1,103 @@
+
+aws_region                    = "us-west-2"
+availability_zone_1           = "a"
+availability_zone_2           = "c"
+
+
+#
+# cp (customer_prefix) and env (environment) prepended to all resources created by the template.
+# Used for identification. e.g. "<customer_prefix>-<prod/test/dev>"
+# these variables decoouple the dedicated management vpc and spoke vpcs from the deployment templates. 
+# If these two variables are the same in both templates, the template will be able to use data sources to find route tables, 
+# subnets, etc to deploy instances into
+#
+cp                                       = "acme"
+env                                      = "test"
+
+#
+# enable management_tgw_attachment - attaches dedicated management vpc to the named TGW. 
+#                                    This allows the jump box access to spoke linux instances. NOT FOR PRODUCTION
+#
+enable_management_tgw_attachment         = true
+
+#
+# enable_build_existing_subnets - creates spoke vpcs and linux instances. NOT FOR PRODUCTION
+#
+enable_build_existing_subnets = true
+
+#
+# enabled_build_management_vpc - creates the dedicated management VPC
+#
+enable_build_management_vpc   = true
+
+#
+# FMGR AND FAZ OPTIONS
+#
+#  Allow creation of FortiManager and FortiAnalyzer instances in the public subnet of the inspection VPC
+# enable assign a public IP to the FortiManager and FortiAnalyzer instances
+#
+enable_fortimanager            = true # create a fortimanager instance in the dedicated mgmt vpc
+enable_fortianalyzer           = false # create a fortianalyzer instance n the dedicated mgmt vpc
+enable_fortimanager_public_ip  = true # attach an EIP to the fmgr instance
+enable_fortianalyzer_public_ip = false # attach an EIP to the faz instance
+
+#
+# Endpoints Variables
+#
+enable_linux_spoke_instances   = true # create linux instances in the spoke vpc for testing/traffic generation
+enable_jump_box                = true # create a linux jump box instance in the dedicated mgmt vpc. This allows access to spoke
+enable_jump_box_public_ip      = true # attach an EIP to the jump box
+
+#
+# Subnet bits = number of bits used in the cidr for subnet.
+# e.g. 10.0.0.0/16 cidr with 8 subnet bits means each subnet is 10.0.0.0/24, 10.0.1.0/24, etc
+#
+subnet_bits                   = 7
+keypair                       = ""
+my_ip                         = ""
+
+fortimanager_instance_type  = "m5.xlarge"
+fortianalyzer_instance_type = "m5.xlarge"
+
+fortimanager_os_version     = "7.4.5"
+fortimanager_host_ip        = 14
+fortianalyzer_os_version    = "7.4.5"
+fortianalyzer_host_ip       = 13
+
+#
+# If enable_fortimanager and/or enable_fortianalyzer is enabled, full path for FortiManager and FortiAnalyzer Licenses.
+# Do not use the same directory as FortiGate autoscale licenses. If placed in the same directory,
+# the autoscale lambda function will attempt to use the FortiManager and FortiAnalyzer licenses as FortiGate licenses
+# and the autoscale instance will fail to launch successfully.
+#
+# If you enable fmgr and/or faz and the file is not found, the templates will fail
+#
+fortimanager_license_file   = "./licenses/fmgr_license.lic"
+fortianalyzer_license_file  = "./licenses/faz_license.lic"
+
+#
+# creates a TGW with this name. This should match in the unified_template because all VPC attach to the named TGW
+#
+attach_to_tgw_name            = "acme-test-tgw"
+
+
+#
+# CIDR blocks for the inspection VPCs
+#
+vpc_cidr_ns_inspection        = "10.0.0.0/16"
+vpc_cidr_management           = "10.3.0.0/16"
+
+vpc_cidr_spoke                = "192.168.0.0/16"
+vpc_cidr_east                 = "192.168.0.0/24"
+vpc_cidr_east_public_az1      = "192.168.0.0/28"
+vpc_cidr_east_public_az2      = "192.168.0.16/28"
+vpc_cidr_west                 = "192.168.1.0/24"
+vpc_cidr_west_public_az1      = "192.168.1.0/28"
+vpc_cidr_west_public_az2      = "192.168.1.16/28"
+acl                           = "private"
+
+#
+# Endpoints Variables
+#
+linux_instance_type            = "t2.micro"
+linux_host_ip                  = 11

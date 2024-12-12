@@ -1,0 +1,164 @@
+
+#
+# region and availability zone for the Inspection VPCs
+#
+aws_region                   = "us-west-2"
+availability_zone_1          = "a"
+availability_zone_2          = "c"
+
+#
+# cp (customer_prefix) and env (environment) prepended to all resources created by the template.
+# Used for identification. e.g. "<customer_prefix>-<prod/test/dev>". Set these to anything you like.
+# These variables need to match the settings for existing_vpc_resources to make the data sources work 
+# and allows this template to find the proper route tables and subnets for deployment
+#
+cp                          = "acme"
+env                         = "test"
+
+#
+# Keypair is a account/region specific resource used to login to the instances.
+#
+# my_ip is used to restrict security groups to only allow traffic from your IP.
+#
+keypair                     = ""
+my_ip                       = ""
+
+#
+# Keypair is a account/region specific resource used to login to the instances.
+#
+# my_ip is used to restrict security groups to only allow traffic from your IP.
+#
+keypair                     = ""
+my_ip                       = ""
+
+#
+# defines how the fortigates in the autoscale group will access the internet. "nat_gw" or "eip"
+# nat_gw will create a NAT Gateway in the public subnet of the inspection VPC and point the route tables to the NAT Gateway
+# eip will assign an Elastic IP to the Fortigate instances in the autoscale group and point the route tables to the IGW
+#
+access_internet_mode = "eip"
+
+#
+# defines how many interfaces the firewall will have. 2-arm is a public interface and a private interface.
+# 1-arm is a single interface that is used for both public and private traffic.
+#
+firewall_policy_mode = "2-arm"
+
+#
+# allow inspection of traffic between spoke vpcs
+#
+enable_east_west_inspection  = true
+
+#
+# INSPECTION VPC Booleans
+#
+# Create NAT Gateways in the public subnets of the inspection VPC and point the route tables to the NAT Gateways
+#
+enable_nat_gateway             = true
+
+#
+# enable_tgw_attachment allows you to attach the Inspection VPCs to the named TGW.
+# If you are attaching the inspection VPC to an existing TGW, provide the name of the TGW here.
+# The named TGW must exist and be in the "Available" state.
+#
+enable_tgw_attachment           = true
+attach_to_tgw_name              = "acme-test-tgw"
+
+#
+# Allow the GWLB to load balance to healthy FortiGate instances in a different zone
+#
+allow_cross_zone_load_balancing = true
+
+#
+# allow the creation of a dedicated management vpc from this template. Its better to do this from existing_vpc_resources template
+# so the management instances are not destroyed by this template
+#
+enable_dedicated_management_vpc = false
+
+#
+# Subnet bits = number of bits used in the cidr for subnet.
+# e.g. 10.0.0.0/16 cidr with 8 subnet bits means each subnet is 10.0.0.0/24, 10.0.1.0/24, etc
+#
+subnet_bits                 = 7
+
+#
+# Prefixes for resources deployed in the North-South and East-West VPCs
+# All resources deployed in the North-South VPC will have the prefix "ns"
+# All resources deployed in the East-West VPC will have the prefix "ew"
+# These values can be anything you like, but they must be unique or you will encounter resource naming conflicts.
+
+#
+ns_module_prefix            = "ns"
+ns_license_directory        = "ns_license"
+base_config_file            = "ns_fgt_config.conf"
+
+#
+# EW and NS Min,Max,Desired capacity for the BYOL ASG and OnDemand ASG.
+# You might find it easier to verify traffic flows with a single instance in the ASG.
+# To increase the number of instances in the ASG,
+# change the values in the autoscale group through the GUI to desired values after the stack is created.
+#
+ns_byol_asg_min_size         = 1
+ns_byol_asg_max_size         = 2
+ns_byol_asg_desired_size     = 1
+
+ns_ondemand_asg_min_size     = 0
+ns_ondemand_asg_max_size     = 2
+ns_ondemand_asg_desired_size = 0
+
+ew_byol_asg_min_size         = 1
+ew_byol_asg_max_size         = 2
+ew_byol_asg_desired_size     = 1
+
+ew_ondemand_asg_min_size     = 0
+ew_ondemand_asg_max_size     = 2
+ew_ondemand_asg_desired_size = 0
+
+#
+# Fortigate Autoscale Variables
+#
+# Fortigate instance type used by all of the ASGs
+#
+fgt_instance_type           = "c5.xlarge"
+#
+# Fortigate version used by all of the ASGs. If you only put the major version, it will use the latest minor version.
+#
+fortios_version             = "7.4.4"
+#
+# default admin password for the Fortigate autoscale instances. This can be changed after the instance is launched.
+# If changed from the Fortigate GUI, the password will be sync'd to other members of the autoscale group.
+#
+fortigate_asg_password      = ""
+
+#
+# Port the fortigate UI is listening on. Default is 443. Some like to move it to 8443
+#
+fortigate_gui_port   = 443
+
+#
+# Endpoint names for the inspection VPCs. These are used to setup the route tables for the inspection VPCs.
+# For now, the autoscale templates deploy the endpoints, but do not pass the endpoint ids back the main template.
+# So, the main templates have to lookup the endpoint ids by name for route table manipulations.
+#
+# This will likely change in the future.
+#
+ns_endpoint_name_az1            = "ns-gwlbe_az1"
+ns_endpoint_name_az2            = "ns-gwlbe_az2"
+
+#
+# CIDR blocks for the inspection VPCs
+#
+vpc_cidr_ns_inspection      = "10.0.0.0/16"
+vpc_cidr_management         = "10.3.0.0/16"
+
+#
+# CIDR blocks for the spoke VPCs.
+#
+vpc_cidr_spoke              = "192.168.0.0/16"
+vpc_cidr_east               = "192.168.0.0/24"
+vpc_cidr_west               = "192.168.1.0/24"
+
+#
+# ACL for linux instances
+#
+acl                         = "private"
