@@ -222,14 +222,14 @@ resource "aws_ec2_transit_gateway_route" "route-to-west-tgw" {
   count                          = var.create_tgw_routes_for_existing ? 1 : 0
   depends_on                     = [module.vpc-ns-inspection]
   destination_cidr_block         = var.vpc_cidr_west
-  transit_gateway_attachment_id  = module.vpc-ns-inspection.inspection_tgw_attachment_id
+  transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_attachment.west[0].id
   transit_gateway_route_table_id = module.vpc-ns-inspection.inspection_tgw_route_table_id
 }
 resource "aws_ec2_transit_gateway_route" "route-to-east-tgw" {
   count                          = var.create_tgw_routes_for_existing? 1 : 0
   depends_on                     = [module.vpc-ns-inspection]
   destination_cidr_block         = var.vpc_cidr_east
-  transit_gateway_attachment_id  = module.vpc-ns-inspection.inspection_tgw_attachment_id
+  transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_attachment.east[0].id
   transit_gateway_route_table_id = module.vpc-ns-inspection.inspection_tgw_route_table_id
 }
 resource "aws_ec2_transit_gateway_route" "east-default-route-to-inspection-tgw" {
