@@ -17,6 +17,8 @@ module "vpc-management" {
   count                          = var.enable_build_management_vpc ? 1 : 0
   depends_on                     = [ module.vpc-transit-gateway.tgw_id ]
   aws_region                     = var.aws_region
+  cp                             = var.cp
+  env                            = var.env
   vpc_name                       = "${var.cp}-${var.env}-management"
   vpc_cidr                       = var.vpc_cidr_management
   subnet_bits                    = var.subnet_bits
@@ -43,15 +45,9 @@ module "vpc-management" {
   linux_instance_type            = var.linux_instance_type
   my_ip                          = var.my_ip
 }
-resource "aws_route" "management-public-default-route-igw-az1" {
+resource "aws_route" "management-public-default-route-igw" {
   depends_on             = [module.vpc-management]
-  route_table_id         = module.vpc-management[0].route_table_management_public_az1_id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = module.vpc-management[0].igw_id
-}
-resource "aws_route" "management-public-default-route-igw-az2" {
-  depends_on             = [module.vpc-management]
-  route_table_id         = module.vpc-management[0].route_table_management_public_az2_id
+  route_table_id         = module.vpc-management[0].route_table_management_public
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = module.vpc-management[0].igw_id
 }
@@ -61,42 +57,22 @@ resource "aws_route" "management-public-default-route-igw-az2" {
 
 resource "aws_route" "public-192-route-tgw-az1" {
   depends_on             = [module.vpc-management]
-  route_table_id         = module.vpc-management[0].route_table_management_public_az1_id
+  count                  = var.enable_management_tgw_attachment ? 1 : 0
+  route_table_id         = module.vpc-management[0].route_table_management_public
   destination_cidr_block = local.rfc1918_192
   transit_gateway_id     = module.vpc-transit-gateway.tgw_id
 }
-resource "aws_route" "public-192-route-tgw-az2" {
-  depends_on             = [module.vpc-management]
-  count                 = var.enable_management_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-management[0].route_table_management_public_az2_id
-  destination_cidr_block = local.rfc1918_192
-  transit_gateway_id     = module.vpc-transit-gateway.tgw_id
-}
-resource "aws_route" "public-10-route-tgw-az1" {
+resource "aws_route" "public-10-route-tgw" {
   depends_on             = [module.vpc-management]
   count                  = var.enable_management_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-management[0].route_table_management_public_az1_id
+  route_table_id         = module.vpc-management[0].route_table_management_public
   destination_cidr_block = local.rfc1918_10
   transit_gateway_id     = module.vpc-transit-gateway.tgw_id
 }
-resource "aws_route" "public-10-route-tgw-az2" {
-  depends_on             = [module.vpc-management]
-  count                 = var.enable_management_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-management[0].route_table_management_public_az2_id
-  destination_cidr_block = local.rfc1918_10
-  transit_gateway_id     = module.vpc-transit-gateway.tgw_id
-}
-resource "aws_route" "public-172-route-tgw-az1" {
+resource "aws_route" "public-172-route-tgw" {
   depends_on             = [module.vpc-management]
   count                  = var.enable_management_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-management[0].route_table_management_public_az1_id
-  destination_cidr_block = local.rfc1918_172
-  transit_gateway_id     = module.vpc-transit-gateway.tgw_id
-}
-resource "aws_route" "public-172-route-tgw-az2" {
-  depends_on             = [module.vpc-management]
-  count                  = var.enable_management_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-management[0].route_table_management_public_az2_id
+  route_table_id         = module.vpc-management[0].route_table_management_public
   destination_cidr_block = local.rfc1918_172
   transit_gateway_id     = module.vpc-transit-gateway.tgw_id
 }

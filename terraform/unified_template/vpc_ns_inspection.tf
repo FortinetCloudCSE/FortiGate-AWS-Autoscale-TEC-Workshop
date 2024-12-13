@@ -42,6 +42,54 @@ data "aws_ec2_transit_gateway" "tgw" {
   }
 }
 
+data "aws_ec2_transit_gateway_attachment" "east" {
+  count = var.create_tgw_routes_for_existing ? 1 : 0
+  filter {
+    name   = "tag:Name"
+    values = ["${var.cp}-${var.env}-east-tgw-attachment"]
+  }
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
+}
+
+data "aws_ec2_transit_gateway_route_table" "east-tgw-rtb" {
+  count = var.create_tgw_routes_for_existing ? 1 : 0
+  filter {
+    name   = "tag:Name"
+    values = ["${var.cp}-${var.env}-east-tgw-rtb"]
+  }
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
+}
+
+data "aws_ec2_transit_gateway_route_table" "west-tgw-rtb" {
+  count = var.create_tgw_routes_for_existing ? 1 : 0
+  filter {
+    name   = "tag:Name"
+    values = ["${var.cp}-${var.env}-west-tgw-rtb"]
+  }
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
+}
+
+data "aws_ec2_transit_gateway_attachment" "west" {
+  count = var.create_tgw_routes_for_existing ? 1 : 0
+  filter {
+    name   = "tag:Name"
+    values = ["${var.cp}-${var.env}-west-tgw-attachment"]
+  }
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
+}
+
 data "aws_vpc_endpoint" "asg_endpoint_az1" {
   depends_on = [module.spk_tgw_gwlb_asg_fgt_igw]
   filter {
@@ -64,10 +112,6 @@ data "aws_route_table" "management_public_route_table_az1" {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-management-public-rt-az1"]
   }
-  filter {
-    name   = "state"
-    values = ["available"]
-  }
 }
 
 data "aws_route_table" "management_public_route_table_az2" {
@@ -76,20 +120,12 @@ data "aws_route_table" "management_public_route_table_az2" {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-management-public-rt-az2"]
   }
-  filter {
-    name   = "state"
-    values = ["available"]
-  }
 }
 data "aws_internet_gateway" "management_igw_id" {
   count = var.enable_dedicated_management_vpc ? 1 : 0
   filter {
     name   = "tag:Name"
     values = ["${var.cp}-${var.env}-management-igw"]
-  }
-  filter {
-    name   = "state"
-    values = ["attached"]
   }
 }
 
@@ -194,69 +230,34 @@ resource "aws_route" "inspection-ns-private-default-route-gwlbe-az2" {
 }
 
 #
-# Routes for the route table.
+# if you are using the existing_vpc_resources template, setup the TGW route tables to route everything.
+# If you are not using existing_vpc_resources template, the equivalent routes will need to be created manually.
 #
-resource "aws_route" "management-mgmt-public-default-route-igw-az1" {
-  count                  = var.enable_dedicated_management_vpc ? 1 : 0
-  route_table_id         = data.aws_route_table.management_public_route_table_az1[0].id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = data.aws_internet_gateway.management_igw_id[0].id
+resource "aws_ec2_transit_gateway_route" "route-to-west-tgw" {
+  count                          = var.create_tgw_routes_for_existing ? 1 : 0
+  depends_on                     = [module.vpc-ns-inspection]
+  destination_cidr_block         = var.vpc_cidr_west
+  transit_gateway_attachment_id  = module.vpc-ns-inspection.inspection_tgw_attachment_id
+  transit_gateway_route_table_id = module.vpc-ns-inspection.inspection_tgw_route_table_id
 }
-resource "aws_route" "management-mgmt-public-default-route-igw-az2" {
-  count = var.enable_dedicated_management_vpc ? 1 : 0
-  route_table_id         = data.aws_route_table.management_public_route_table_az2[0].id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = data.aws_internet_gateway.management_igw_id[0].id
+resource "aws_ec2_transit_gateway_route" "route-to-east-tgw" {
+  count                          = var.create_tgw_routes_for_existing? 1 : 0
+  depends_on                     = [module.vpc-ns-inspection]
+  destination_cidr_block         = var.vpc_cidr_east
+  transit_gateway_attachment_id  = module.vpc-ns-inspection.inspection_tgw_attachment_id
+  transit_gateway_route_table_id = module.vpc-ns-inspection.inspection_tgw_route_table_id
 }
-resource "aws_route" "inspection-mgmt-public-192-route-tgw-az1" {
-  count                  = var.enable_dedicated_management_vpc && var.enable_tgw_attachment ? 1 : 0
-  route_table_id         = data.aws_route_table.management_public_route_table_az1[0].id
-  destination_cidr_block = local.rfc1918_192
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+resource "aws_ec2_transit_gateway_route" "east-default-route-to-inspection-tgw" {
+  count                          = var.create_tgw_routes_for_existing? 1 : 0
+  depends_on                     = [module.vpc-ns-inspection]
+  destination_cidr_block         = "0.0.0.0/0"
+  transit_gateway_attachment_id  = module.vpc-ns-inspection.inspection_tgw_attachment_id
+  transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.east-tgw-rtb[0].id
 }
-resource "aws_route" "inspection-mgmt-public-10-route-tgw-az1" {
-  count                  = var.enable_dedicated_management_vpc && var.enable_tgw_attachment ? 1 : 0
-  route_table_id         = data.aws_route_table.management_public_route_table_az1[0].id
-  destination_cidr_block = local.rfc1918_10
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
+resource "aws_ec2_transit_gateway_route" "west-default-route-to-inspection-tgw" {
+  count                          = var.create_tgw_routes_for_existing? 1 : 0
+  depends_on                     = [module.vpc-ns-inspection]
+  destination_cidr_block         = "0.0.0.0/0"
+  transit_gateway_attachment_id  = module.vpc-ns-inspection.inspection_tgw_attachment_id
+  transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.west-tgw-rtb[0].id
 }
-resource "aws_route" "inspection-mgmt-public-172-route-tgw-az1" {
-  count                  = var.enable_dedicated_management_vpc && var.enable_tgw_attachment ? 1 : 0
-  route_table_id         = data.aws_route_table.management_public_route_table_az1[0].id
-  destination_cidr_block = local.rfc1918_172
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-}
-
-
-resource "aws_route" "inspection-mgmt-public-192-route-tgw-az2" {
-  count                  = var.enable_dedicated_management_vpc && var.enable_tgw_attachment ? 1 : 0
-  route_table_id         = data.aws_route_table.management_public_route_table_az2[0].id
-  destination_cidr_block = local.rfc1918_192
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-}
-resource "aws_route" "inspection-mgmt-public-10-route-tgw-az2" {
-  count                  = var.enable_dedicated_management_vpc && var.enable_tgw_attachment ? 1 : 0
-  route_table_id         = data.aws_route_table.management_public_route_table_az2[0].id
-  destination_cidr_block = local.rfc1918_10
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-}
-resource "aws_route" "inspection-mgmt-public-172-route-tgw-az2" {
-  count                  = var.enable_dedicated_management_vpc && var.enable_tgw_attachment ? 1 : 0
-  route_table_id         = data.aws_route_table.management_public_route_table_az2[0].id
-  destination_cidr_block = local.rfc1918_172
-  transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
-}
-# resource "aws_ec2_transit_gateway_route" "route-to-west-tgw" {
-#   count                          = var.enable_tgw_attachment ? 1 : 0
-#   depends_on                     = [module.vpc-transit-gateway-attachment]
-#   destination_cidr_block         = var.vpc_cidr_west
-#   transit_gateway_attachment_id  = module.vpc-ns-inspection.tgw_attachment_id
-#   transit_gateway_route_table_id = module.vpc-ns-inspection[0].inspection_tgw_route_table_id
-# }
-# resource "aws_ec2_transit_gateway_route" "route-to-east-tgw" {
-#   count                          = var.enable_tgw_attachment ? 1 : 0
-#   depends_on                     = [module.vpc-ns-inspection]
-#   destination_cidr_block         = var.vpc_cidr_east
-#   transit_gateway_attachment_id  = module.vpc-ns-inspection.tgw_attachment_id
-#   transit_gateway_route_table_id = module.vpc-ns-inspection[0].inspection_tgw_route_table_id
-# }

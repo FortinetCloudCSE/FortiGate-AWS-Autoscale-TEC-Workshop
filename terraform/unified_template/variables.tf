@@ -56,6 +56,10 @@ variable "enable_dedicated_management_vpc" {
   description = "Boolean to allow creation of dedicated management interface in management VPC"
   type        = bool
 }
+variable "create_tgw_routes_for_existing" {
+  description = "Boolean to allow creation of TGW routes for the existing_vpc_resources template"
+  type        = bool
+}
 variable "enable_east_west_inspection" {
   description = "Boolean to allow creation of a separate autoscale group for east/west inspection"
   type        = bool

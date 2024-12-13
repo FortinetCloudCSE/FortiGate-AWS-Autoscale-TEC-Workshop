@@ -57,6 +57,13 @@ enable_tgw_attachment           = true
 attach_to_tgw_name              = "acme-test-tgw"
 
 #
+# Only set create_tgw_routes_for_existing to true if you created the existing_vp_resources template.
+#
+create_tgw_routes_for_existing  = false
+
+attach_to_tgw_name              = "acme-test-tgw"
+
+#
 # Allow the GWLB to load balance to healthy FortiGate instances in a different zone
 #
 allow_cross_zone_load_balancing = true

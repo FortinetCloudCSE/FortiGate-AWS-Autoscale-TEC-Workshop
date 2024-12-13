@@ -62,24 +62,18 @@ resource "aws_default_route_table" "route_east" {
 }
 
 resource "aws_route" "default-route-east-public" {
-  depends_on             = [module.vpc-transit-gateway-attachment-east.tgw_attachment_id]
+  depends_on             = [module.vpc-transit-gateway-attachment-east]
   count                  = var.enable_build_existing_subnets ? 1 : 0
   route_table_id         = module.vpc-east[0].vpc_main_route_table_id
   destination_cidr_block = "0.0.0.0/0"
   transit_gateway_id     = module.vpc-transit-gateway.tgw_id
 }
 resource "aws_route" "management-route-east-public" {
+  depends_on             = [module.vpc-transit-gateway-attachment-east]
   count                  = var.enable_build_management_vpc ? 1 : 0
   route_table_id         = module.vpc-east[0].vpc_main_route_table_id
   destination_cidr_block = var.vpc_cidr_management
   transit_gateway_id     = module.vpc-transit-gateway.tgw_id
-}
-resource "aws_ec2_transit_gateway_route" "route-east-default-tgw" {
-  count                          = var.enable_build_existing_subnets ? 1 : 0
-  depends_on                     = [module.vpc-transit-gateway-attachment-east]
-  destination_cidr_block         = "0.0.0.0/0"
-  transit_gateway_attachment_id  = module.vpc-transit-gateway-attachment-east[0].tgw_attachment_id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.east[0].id
 }
 
 

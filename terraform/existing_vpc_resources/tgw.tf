@@ -29,7 +29,7 @@ resource "aws_ec2_transit_gateway_route_table" "east" {
   count                           = var.enable_build_existing_subnets ? 1 : 0
   transit_gateway_id              = module.vpc-transit-gateway.tgw_id
   tags = {
-      Name = "${var.cp}-${var.env}-East VPC TGW Route Table"
+      Name = "${var.cp}-${var.env}-east-tgw-rtb"
   }
 }
 resource "aws_ec2_transit_gateway_route_table_association" "east" {
@@ -66,7 +66,7 @@ resource "aws_ec2_transit_gateway_route_table" "west" {
   count                           = var.enable_build_existing_subnets ? 1 : 0
   transit_gateway_id              = module.vpc-transit-gateway.tgw_id
   tags = {
-    Name = "${var.cp}-${var.env}-West VPC TGW Route Table"
+    Name = "${var.cp}-${var.env}-west-tgw-rtb"
   }
 }
 
