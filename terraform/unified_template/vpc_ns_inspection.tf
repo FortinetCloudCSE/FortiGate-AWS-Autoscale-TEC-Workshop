@@ -106,21 +106,6 @@ data "aws_vpc_endpoint" "asg_endpoint_az2" {
   }
 }
 
-data "aws_route_table" "management_public_route_table_az1" {
-  count = var.enable_dedicated_management_vpc ? 1 : 0
-  filter {
-    name   = "tag:Name"
-    values = ["${var.cp}-${var.env}-management-public-rt-az1"]
-  }
-}
-
-data "aws_route_table" "management_public_route_table_az2" {
-  count = var.enable_dedicated_management_vpc ? 1 : 0
-  filter {
-    name   = "tag:Name"
-    values = ["${var.cp}-${var.env}-management-public-rt-az2"]
-  }
-}
 data "aws_internet_gateway" "management_igw_id" {
   count = var.enable_dedicated_management_vpc ? 1 : 0
   filter {
