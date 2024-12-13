@@ -246,3 +246,17 @@ resource "aws_route" "inspection-mgmt-public-172-route-tgw-az2" {
   destination_cidr_block = local.rfc1918_172
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
+# resource "aws_ec2_transit_gateway_route" "route-to-west-tgw" {
+#   count                          = var.enable_tgw_attachment ? 1 : 0
+#   depends_on                     = [module.vpc-transit-gateway-attachment]
+#   destination_cidr_block         = var.vpc_cidr_west
+#   transit_gateway_attachment_id  = module.vpc-ns-inspection.tgw_attachment_id
+#   transit_gateway_route_table_id = module.vpc-ns-inspection[0].inspection_tgw_route_table_id
+# }
+# resource "aws_ec2_transit_gateway_route" "route-to-east-tgw" {
+#   count                          = var.enable_tgw_attachment ? 1 : 0
+#   depends_on                     = [module.vpc-ns-inspection]
+#   destination_cidr_block         = var.vpc_cidr_east
+#   transit_gateway_attachment_id  = module.vpc-ns-inspection.tgw_attachment_id
+#   transit_gateway_route_table_id = module.vpc-ns-inspection[0].inspection_tgw_route_table_id
+# }
