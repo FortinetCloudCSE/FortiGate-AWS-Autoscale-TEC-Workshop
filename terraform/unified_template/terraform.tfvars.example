@@ -61,8 +61,6 @@ attach_to_tgw_name              = "acme-test-tgw"
 #
 create_tgw_routes_for_existing  = false
 
-attach_to_tgw_name              = "acme-test-tgw"
-
 #
 # Allow the GWLB to load balance to healthy FortiGate instances in a different zone
 #

@@ -159,22 +159,6 @@ variable "ns_ondemand_asg_desired_size" {
     description = "Desired size for the OnDemand ASG"
     type        = number
 }
-variable "ew_byol_asg_min_size" {
-    description = "Minimum size for the BYOL ASG"
-    type        = number
-}
-variable "ew_byol_asg_max_size" {
-    description = "Maximum size for the BYOL ASG"
-    type        = number
-}
-variable "ew_byol_asg_desired_size" {
-    description = "Desired size for the BYOL ASG"
-    type        = number
-}
-variable "ew_ondemand_asg_min_size" {
-    description = "Minimum size for the On Demand ASG"
-    type        = number
-}
 variable "ew_ondemand_asg_max_size" {
     description = "Maximum size for the OnDemand ASG"
     type        = number
