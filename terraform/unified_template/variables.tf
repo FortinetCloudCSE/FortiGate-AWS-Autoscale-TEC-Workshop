@@ -159,14 +159,6 @@ variable "ns_ondemand_asg_desired_size" {
     description = "Desired size for the OnDemand ASG"
     type        = number
 }
-variable "ew_ondemand_asg_max_size" {
-    description = "Maximum size for the OnDemand ASG"
-    type        = number
-}
-variable "ew_ondemand_asg_desired_size" {
-    description = "Desired size for the OnDemand ASG"
-    type        = number
-}
 variable "acl" {
   description = "The acl for linux instances"
 }

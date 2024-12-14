@@ -1,6 +1,8 @@
-
 locals {
-  fgt_config_file = "./${var.firewall_policy_mode}-${var.base_config_file}"
+  dedicated_mgmt = var.enable_dedicated_management_vpc ? "-with_dedicated_mgmt" : ""
+}
+locals {
+  fgt_config_file = "./${var.firewall_policy_mode}${local.dedicated_mgmt}-${var.base_config_file}"
 }
 locals {
   management_device_index = var.firewall_policy_mode == "2-arm" ? 2 : 1
