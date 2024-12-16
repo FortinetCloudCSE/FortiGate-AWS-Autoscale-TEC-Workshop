@@ -1,5 +1,5 @@
 locals {
-  dedicated_mgmt = var.enable_dedicated_management_vpc ? "-with_dedicated_mgmt" : ""
+  dedicated_mgmt = var.enable_dedicated_management_vpc ? "-wdm" : ""
 }
 locals {
   fgt_config_file = "./${var.firewall_policy_mode}${local.dedicated_mgmt}-${var.base_config_file}"
