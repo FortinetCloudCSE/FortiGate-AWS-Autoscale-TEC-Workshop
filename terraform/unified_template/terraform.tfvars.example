@@ -9,7 +9,7 @@ availability_zone_2          = "c"
 #
 # cp (customer_prefix) and env (environment) prepended to all resources created by the template.
 # Used for identification. e.g. "<customer_prefix>-<prod/test/dev>". Set these to anything you like.
-# These variables need to match the settings for existing_vpc_resources to make the data sources work 
+# These variables need to match the settings for existing_vpc_resources to make the data sources work
 # and allows this template to find the proper route tables and subnets for deployment
 #
 cp                          = "acme"
@@ -22,6 +22,12 @@ env                         = "test"
 #
 keypair                     = ""
 my_ip                       = ""
+
+#
+# default admin password for the Fortigate autoscale instances. This can be changed after the instance is launched.
+# If changed from the Fortigate GUI, the password will be sync'd to other members of the autoscale group.
+#
+fortigate_asg_password      = ""
 
 #
 # defines how the fortigates in the autoscale group will access the internet. "nat_gw" or "eip"
@@ -37,16 +43,24 @@ access_internet_mode = "eip"
 firewall_policy_mode = "2-arm"
 
 #
-# allow inspection of traffic between spoke vpcs
-#
-enable_east_west_inspection  = true
-
-#
 # INSPECTION VPC Booleans
 #
 # Create NAT Gateways in the public subnets of the inspection VPC and point the route tables to the NAT Gateways
 #
 enable_nat_gateway             = true
+
+#
+# allow the creation of a dedicated management vpc from this template. Its better to do this from existing_vpc_resources template
+# so the management instances are not destroyed by this template.
+#
+# NOTE: You should keep this false if you deployed the management vpc from the existing_vpc_resources template.
+#
+enable_dedicated_management_vpc = false
+
+#
+# allow inspection of traffic between spoke vpcs
+#
+enable_east_west_inspection  = true
 
 #
 # enable_tgw_attachment allows you to attach the Inspection VPCs to the named TGW.
@@ -67,14 +81,6 @@ create_tgw_routes_for_existing  = false
 allow_cross_zone_load_balancing = true
 
 #
-# allow the creation of a dedicated management vpc from this template. Its better to do this from existing_vpc_resources template
-# so the management instances are not destroyed by this template.
-#
-# NOTE: You should keep this false if you deployed the management vpc from the existing_vpc_resources template.
-#
-enable_dedicated_management_vpc = false
-
-#
 # Subnet bits = number of bits used in the cidr for subnet.
 # e.g. 10.0.0.0/16 cidr with 8 subnet bits means each subnet is 10.0.0.0/24, 10.0.1.0/24, etc
 #
@@ -85,11 +91,17 @@ subnet_bits                 = 7
 # All resources deployed in the North-South VPC will have the prefix "ns"
 # All resources deployed in the East-West VPC will have the prefix "ew"
 # These values can be anything you like, but they must be unique or you will encounter resource naming conflicts.
+ns_module_prefix            = "ns"
 
 #
-ns_module_prefix            = "ns"
+# directory where BYOL Licenses for NS firewall group are stored
+#
 ns_license_directory        = "ns_license"
-base_config_file            = "ns_fgt_config.conf"
+#
+# base fortios configuration file. These files are in the base directory and prefixes are added depending on
+# the configuration being deployed. e.g. 1-arm-wdm-fgt-conf.cfg, 2-arm-fgt-conf.cfg
+#
+base_config_file            = "fgt-conf.cfg"
 
 #
 # EW and NS Min,Max,Desired capacity for the BYOL ASG and OnDemand ASG.
@@ -110,16 +122,11 @@ ns_ondemand_asg_desired_size = 0
 #
 # Fortigate instance type used by all of the ASGs
 #
-fgt_instance_type           = "c5.xlarge"
+fgt_instance_type           = "c7gn.xlarge"
 #
 # Fortigate version used by all of the ASGs. If you only put the major version, it will use the latest minor version.
 #
 fortios_version             = "7.4.4"
-#
-# default admin password for the Fortigate autoscale instances. This can be changed after the instance is launched.
-# If changed from the Fortigate GUI, the password will be sync'd to other members of the autoscale group.
-#
-fortigate_asg_password      = ""
 
 #
 # Port the fortigate UI is listening on. Default is 443. Some like to move it to 8443
@@ -130,9 +137,6 @@ fortigate_gui_port   = 443
 # Endpoint names for the inspection VPCs. These are used to setup the route tables for the inspection VPCs.
 # For now, the autoscale templates deploy the endpoints, but do not pass the endpoint ids back the main template.
 # So, the main templates have to lookup the endpoint ids by name for route table manipulations.
-#
-# This will likely change in the future.
-#
 ns_endpoint_name_az1            = "ns-gwlbe_az1"
 ns_endpoint_name_az2            = "ns-gwlbe_az2"
 
