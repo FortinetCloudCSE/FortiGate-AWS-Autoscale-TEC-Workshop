@@ -64,10 +64,6 @@ variable "enable_east_west_inspection" {
   description = "Boolean to allow creation of a separate autoscale group for east/west inspection"
   type        = bool
 }
-variable "enable_nat_gateway" {
-  description = "Boolean to allow creation of nat gateways in each AZ of Inspection VPC"
-  type        = bool
-}
 variable "enable_tgw_attachment" {
   description = "Allow Inspection VPC to attach to an existing TGW"
   type        = bool

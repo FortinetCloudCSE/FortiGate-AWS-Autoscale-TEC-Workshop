@@ -43,13 +43,6 @@ access_internet_mode = "eip"
 firewall_policy_mode = "2-arm"
 
 #
-# INSPECTION VPC Booleans
-#
-# Create NAT Gateways in the public subnets of the inspection VPC and point the route tables to the NAT Gateways
-#
-enable_nat_gateway             = true
-
-#
 # allow the creation of a dedicated management vpc from this template. Its better to do this from existing_vpc_resources template
 # so the management instances are not destroyed by this template.
 #

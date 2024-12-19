@@ -11,6 +11,9 @@ provider "aws" {
   }
 }
 locals {
+  enable_nat_gateway = var.access_internet_mode == "nat_gw" ? true : false
+}
+locals {
   rfc1918_192 = "192.168.0.0/16"
 }
 locals {
@@ -121,7 +124,7 @@ module "vpc-ns-inspection" {
   subnet_bits                      = var.subnet_bits
   availability_zone_1              = local.availability_zone_1
   availability_zone_2              = local.availability_zone_2
-  enable_nat_gateway               = var.enable_nat_gateway
+  enable_nat_gateway               = local.enable_nat_gateway
   named_tgw                        = var.attach_to_tgw_name
   enable_tgw_attachment            = var.enable_tgw_attachment
 }
@@ -177,26 +180,28 @@ resource "aws_route" "gwlbe-172-route-igw-az2" {
 #
 resource "aws_route" "inspection-ns-public-default-route-ngw-az1" {
   depends_on             = [module.vpc-ns-inspection]
-  count                  = var.enable_nat_gateway ? 1 : 0
-  route_table_id         = module.vpc-ns-inspection.route_table_gwlbe_az1_id
+  count                  = local.enable_nat_gateway ? 1 : 0
+  route_table_id         = module.vpc-ns-inspection.route_table_public_az1_id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = module.vpc-ns-inspection.aws_nat_gateway_vpc_az1_id
 }
 resource "aws_route" "inspection-ns-public-default-route-ngw-az2" {
   depends_on             = [module.vpc-ns-inspection]
-  count                  = var.enable_nat_gateway ? 1 : 0
-  route_table_id         = module.vpc-ns-inspection.route_table_gwlbe_az2_id
+  count                  = local.enable_nat_gateway ? 1 : 0
+  route_table_id         = module.vpc-ns-inspection.route_table_public_az2_id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = module.vpc-ns-inspection.aws_nat_gateway_vpc_az2_id
 }
 resource "aws_route" "inspection-ns-public-default-route-igw-az1" {
   depends_on             = [module.vpc-ns-inspection]
+  count                  = !local.enable_nat_gateway ? 1 : 0
   route_table_id         = module.vpc-ns-inspection.route_table_public_az1_id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = module.vpc-ns-inspection.igw_id
 }
 resource "aws_route" "inspection-ns-public-default-route-igw-az2" {
   depends_on             = [module.vpc-ns-inspection]
+  count                  = !local.enable_nat_gateway ? 1 : 0
   route_table_id         = module.vpc-ns-inspection.route_table_public_az2_id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = module.vpc-ns-inspection.igw_id
