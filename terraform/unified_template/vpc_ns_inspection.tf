@@ -10,6 +10,12 @@ provider "aws" {
     tags = local.common_tags
   }
 }
+check "config_validation" {
+  assert {
+    condition = !(var.enable_dedicated_management_eni && var.enable_dedicated_management_vpc)
+    error_message = "Cannot enable both dedicated management VPC and dedicated management ENI"
+  }
+}
 locals {
   enable_nat_gateway = var.access_internet_mode == "nat_gw" ? true : false
 }
@@ -125,6 +131,7 @@ module "vpc-ns-inspection" {
   availability_zone_1              = local.availability_zone_1
   availability_zone_2              = local.availability_zone_2
   enable_nat_gateway               = local.enable_nat_gateway
+  enable_dedicated_management_eni  = var.enable_dedicated_management_eni
   named_tgw                        = var.attach_to_tgw_name
   enable_tgw_attachment            = var.enable_tgw_attachment
 }

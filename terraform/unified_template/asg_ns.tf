@@ -1,5 +1,5 @@
 locals {
-  dedicated_mgmt = var.enable_dedicated_management_vpc ? "-wdm" : ""
+  dedicated_mgmt = var.enable_dedicated_management_vpc ? "-wdm" : var.enable_dedicated_management_eni ? "-wdm-eni" : ""
 }
 locals {
   fgt_config_file = "./${var.firewall_policy_mode}${local.dedicated_mgmt}-${var.base_config_file}"
@@ -15,6 +15,12 @@ locals {
 }
 locals {
   management_public_az2 = "${var.cp}-${var.env}-management-public-az2-subnet"
+}
+locals {
+  inspection_management_az1 = "${var.cp}-${var.env}-inspection-management-az1-subnet"
+}
+locals {
+  inspection_management_az2 = "${var.cp}-${var.env}-inspection-management-az2-subnet"
 }
 data "aws_vpc" "management_vpc" {
   count = var.enable_dedicated_management_vpc ? 1 : 0
@@ -49,10 +55,34 @@ data "aws_subnet" "public_subnet_az2" {
     values = ["available"]
   }
 }
+data "aws_subnet" "management_subnet_az1" {
+  depends_on = [module.vpc-ns-inspection]
+  count = var.enable_dedicated_management_eni ? 1 : 0
+  filter {
+    name   = "tag:Name"
+    values = [local.inspection_management_az1]
+  }
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
+}
+data "aws_subnet" "management_subnet_az2" {
+  depends_on = [module.vpc-ns-inspection]
+  count = var.enable_dedicated_management_eni ? 1 : 0
+  filter {
+    name   = "tag:Name"
+    values = [local.inspection_management_az2]
+  }
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
+}
 resource "aws_security_group" "management-vpc-sg" {
-  count = var.enable_dedicated_management_vpc ? 1 : 0
+  count = var.enable_dedicated_management_vpc || var.enable_dedicated_management_eni ? 1 : 0
   description = "Security Group for ENI in the management VPC"
-  vpc_id = data.aws_vpc.management_vpc[0].id
+  vpc_id = var.enable_dedicated_management_vpc ? data.aws_vpc.management_vpc[0].id : module.vpc-ns-inspection.vpc_id
   ingress {
     description = "Allow egress ALL"
     from_port = 0
@@ -171,17 +201,17 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
   fgt_access_internet_mode = var.access_internet_mode
     asgs = {
     fgt_byol_asg = {
-      extra_network_interfaces = !var.enable_dedicated_management_vpc ? {} : {
+      extra_network_interfaces = !var.enable_dedicated_management_vpc && !var.enable_dedicated_management_eni ? {} : {
         "dedicated_port" = {
           device_index = local.management_device_index
           enable_public_ip = true
           subnet = [
             {
-              id = data.aws_subnet.public_subnet_az1[0].id
+              id = var.enable_dedicated_management_vpc ? data.aws_subnet.public_subnet_az1[0].id : data.aws_subnet.management_subnet_az1[0].id
               zone_name = local.availability_zone_1
             },
             {
-              id = data.aws_subnet.public_subnet_az2[0].id
+              id = var.enable_dedicated_management_vpc ? data.aws_subnet.public_subnet_az2[0].id : data.aws_subnet.management_subnet_az2[0].id
               zone_name = local.availability_zone_2
             }
           ]
@@ -220,17 +250,17 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
       dynamodb_table_name   = "fgt_asg_track_table"
     },
     fgt_on_demand_asg = {
-      extra_network_interfaces = !var.enable_dedicated_management_vpc ? {} : {
+      extra_network_interfaces = !var.enable_dedicated_management_vpc && !var.enable_dedicated_management_eni ? {} : {
         "dedicated_port" = {
           device_index = local.management_device_index
           enable_public_ip = true
           subnet = [
             {
-              id = data.aws_subnet.public_subnet_az1[0].id
+              id = var.enable_dedicated_management_vpc ? data.aws_subnet.public_subnet_az1[0].id : data.aws_subnet.management_subnet_az1[0].id
               zone_name = local.availability_zone_1
             },
             {
-              id = data.aws_subnet.public_subnet_az2[0].id
+              id = var.enable_dedicated_management_vpc ? data.aws_subnet.public_subnet_az2[0].id : data.aws_subnet.management_subnet_az2[0].id
               zone_name = local.availability_zone_2
             }
           ]

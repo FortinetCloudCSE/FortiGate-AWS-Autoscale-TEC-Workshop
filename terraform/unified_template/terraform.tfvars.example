@@ -51,6 +51,12 @@ firewall_policy_mode = "2-arm"
 enable_dedicated_management_vpc = false
 
 #
+# allow the creation of a dedicated managment subnet in the inspection VPC. Then create a dedicated management
+# ENI in the management subnet.
+#
+enable_dedicated_management_eni  = false
+
+#
 # allow inspection of traffic between spoke vpcs
 #
 enable_east_west_inspection  = true
