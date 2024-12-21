@@ -40,7 +40,7 @@ access_internet_mode = "nat_gw"
 # defines how many interfaces the firewall will have. 2-arm is a public interface and a private interface.
 # 1-arm is a single interface that is used for both public and private traffic.
 #
-firewall_policy_mode = "2-arm"
+firewall_policy_mode = "1-arm"
 
 #
 # allow the creation of a dedicated management vpc from this template. Its better to do this from existing_vpc_resources template
