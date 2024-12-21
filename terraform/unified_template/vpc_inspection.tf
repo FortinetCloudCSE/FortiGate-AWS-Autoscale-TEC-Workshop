@@ -15,6 +15,14 @@ check "config_validation" {
     condition = !(var.enable_dedicated_management_eni && var.enable_dedicated_management_vpc)
     error_message = "Cannot enable both dedicated management VPC and dedicated management ENI"
   }
+  assert {
+    condition = var.access_internet_mode == "eip" || var.access_internet_mode == "nat_gw"
+    error_message = "access_internet_mode must be 'eip' or 'nat_gw'"
+  }
+  assert {
+    condition = var.firewall_policy_mode == "1-arm" || var.firewall_policy_mode == "2-arm"
+    error_message = "access_internet_mode must be 'eip' or 'nat_gw'"
+  }
 }
 locals {
   enable_nat_gateway = var.access_internet_mode == "nat_gw" ? true : false
@@ -103,7 +111,7 @@ data "aws_vpc_endpoint" "asg_endpoint_az1" {
   depends_on = [module.spk_tgw_gwlb_asg_fgt_igw]
   filter {
     name   = "tag:Name"
-    values = [var.ns_endpoint_name_az1]
+    values = [var.endpoint_name_az1]
   }
 }
 
@@ -111,7 +119,7 @@ data "aws_vpc_endpoint" "asg_endpoint_az2" {
   depends_on = [module.spk_tgw_gwlb_asg_fgt_igw]
   filter {
     name   = "tag:Name"
-    values = [var.ns_endpoint_name_az2]
+    values = [var.endpoint_name_az2]
   }
 }
 
@@ -123,10 +131,10 @@ data "aws_internet_gateway" "management_igw_id" {
   }
 }
 
-module "vpc-ns-inspection" {
+module "vpc-inspection" {
   source = "git::https://github.com/40netse/terraform-modules.git//aws_inspection_vpc"
   vpc_name                         = "${var.cp}-${var.env}-inspection"
-  vpc_cidr                         = var.vpc_cidr_ns_inspection
+  vpc_cidr                         = var.vpc_cidr_inspection
   subnet_bits                      = var.subnet_bits
   availability_zone_1              = local.availability_zone_1
   availability_zone_2              = local.availability_zone_2
@@ -140,43 +148,43 @@ module "vpc-ns-inspection" {
 #
 
 resource "aws_route" "gwlbe-192-route-igw-az1" {
-  depends_on             = [module.vpc-ns-inspection, var.enable_tgw_attachment]
-  route_table_id         = module.vpc-ns-inspection.route_table_gwlbe_az1_id
+  depends_on             = [module.vpc-inspection, var.enable_tgw_attachment]
+  route_table_id         = module.vpc-inspection.route_table_gwlbe_az1_id
   destination_cidr_block = local.rfc1918_192
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "gwlbe-192-route-igw-az2" {
-  depends_on             = [module.vpc-ns-inspection]
+  depends_on             = [module.vpc-inspection]
   count                 = var.enable_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-ns-inspection.route_table_gwlbe_az2_id
+  route_table_id         = module.vpc-inspection.route_table_gwlbe_az2_id
   destination_cidr_block = local.rfc1918_192
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "gwlbe-10-route-igw-az1" {
-  depends_on             = [module.vpc-ns-inspection]
+  depends_on             = [module.vpc-inspection]
   count                  = var.enable_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-ns-inspection.route_table_gwlbe_az1_id
+  route_table_id         = module.vpc-inspection.route_table_gwlbe_az1_id
   destination_cidr_block = local.rfc1918_10
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "gwlbe-10-route-igw-az2" {
-  depends_on             = [module.vpc-ns-inspection]
+  depends_on             = [module.vpc-inspection]
   count                 = var.enable_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-ns-inspection.route_table_gwlbe_az2_id
+  route_table_id         = module.vpc-inspection.route_table_gwlbe_az2_id
   destination_cidr_block = local.rfc1918_10
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "gwlbe-172-route-igw-az1" {
-  depends_on             = [module.vpc-ns-inspection]
+  depends_on             = [module.vpc-inspection]
   count                  = var.enable_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-ns-inspection.route_table_gwlbe_az1_id
+  route_table_id         = module.vpc-inspection.route_table_gwlbe_az1_id
   destination_cidr_block = local.rfc1918_172
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
 resource "aws_route" "gwlbe-172-route-igw-az2" {
-  depends_on             = [module.vpc-ns-inspection]
+  depends_on             = [module.vpc-inspection]
   count                  = var.enable_tgw_attachment ? 1 : 0
-  route_table_id         = module.vpc-ns-inspection.route_table_gwlbe_az2_id
+  route_table_id         = module.vpc-inspection.route_table_gwlbe_az2_id
   destination_cidr_block = local.rfc1918_172
   transit_gateway_id     = data.aws_ec2_transit_gateway.tgw.id
 }
@@ -186,42 +194,42 @@ resource "aws_route" "gwlbe-172-route-igw-az2" {
 # If not, make the default route go to the internet gateway.
 #
 resource "aws_route" "inspection-ns-public-default-route-ngw-az1" {
-  depends_on             = [module.vpc-ns-inspection]
+  depends_on             = [module.vpc-inspection]
   count                  = local.enable_nat_gateway ? 1 : 0
-  route_table_id         = module.vpc-ns-inspection.route_table_public_az1_id
+  route_table_id         = module.vpc-inspection.route_table_public_az1_id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = module.vpc-ns-inspection.aws_nat_gateway_vpc_az1_id
+  nat_gateway_id         = module.vpc-inspection.aws_nat_gateway_vpc_az1_id
 }
 resource "aws_route" "inspection-ns-public-default-route-ngw-az2" {
-  depends_on             = [module.vpc-ns-inspection]
+  depends_on             = [module.vpc-inspection]
   count                  = local.enable_nat_gateway ? 1 : 0
-  route_table_id         = module.vpc-ns-inspection.route_table_public_az2_id
+  route_table_id         = module.vpc-inspection.route_table_public_az2_id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = module.vpc-ns-inspection.aws_nat_gateway_vpc_az2_id
+  nat_gateway_id         = module.vpc-inspection.aws_nat_gateway_vpc_az2_id
 }
 resource "aws_route" "inspection-ns-public-default-route-igw-az1" {
-  depends_on             = [module.vpc-ns-inspection]
+  depends_on             = [module.vpc-inspection]
   count                  = !local.enable_nat_gateway ? 1 : 0
-  route_table_id         = module.vpc-ns-inspection.route_table_public_az1_id
+  route_table_id         = module.vpc-inspection.route_table_public_az1_id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = module.vpc-ns-inspection.igw_id
+  gateway_id             = module.vpc-inspection.igw_id
 }
 resource "aws_route" "inspection-ns-public-default-route-igw-az2" {
-  depends_on             = [module.vpc-ns-inspection]
+  depends_on             = [module.vpc-inspection]
   count                  = !local.enable_nat_gateway ? 1 : 0
-  route_table_id         = module.vpc-ns-inspection.route_table_public_az2_id
+  route_table_id         = module.vpc-inspection.route_table_public_az2_id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = module.vpc-ns-inspection.igw_id
+  gateway_id             = module.vpc-inspection.igw_id
 }
 resource "aws_route" "inspection-ns-private-default-route-gwlbe-az1" {
-  depends_on             = [module.vpc-ns-inspection]
-  route_table_id         = module.vpc-ns-inspection.route_table_private_az1_id
+  depends_on             = [module.vpc-inspection]
+  route_table_id         = module.vpc-inspection.route_table_private_az1_id
   destination_cidr_block = "0.0.0.0/0"
   vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az1.id
 }
 resource "aws_route" "inspection-ns-private-default-route-gwlbe-az2" {
-  depends_on             = [module.vpc-ns-inspection]
-  route_table_id         = module.vpc-ns-inspection.route_table_private_az2_id
+  depends_on             = [module.vpc-inspection]
+  route_table_id         = module.vpc-inspection.route_table_private_az2_id
   destination_cidr_block = "0.0.0.0/0"
   vpc_endpoint_id        = data.aws_vpc_endpoint.asg_endpoint_az2.id
 }
@@ -232,29 +240,29 @@ resource "aws_route" "inspection-ns-private-default-route-gwlbe-az2" {
 #
 resource "aws_ec2_transit_gateway_route" "route-to-west-tgw" {
   count                          = var.create_tgw_routes_for_existing ? 1 : 0
-  depends_on                     = [module.vpc-ns-inspection]
+  depends_on                     = [module.vpc-inspection]
   destination_cidr_block         = var.vpc_cidr_west
   transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_attachment.west[0].id
-  transit_gateway_route_table_id = module.vpc-ns-inspection.inspection_tgw_route_table_id
+  transit_gateway_route_table_id = module.vpc-inspection.inspection_tgw_route_table_id
 }
 resource "aws_ec2_transit_gateway_route" "route-to-east-tgw" {
   count                          = var.create_tgw_routes_for_existing? 1 : 0
-  depends_on                     = [module.vpc-ns-inspection]
+  depends_on                     = [module.vpc-inspection]
   destination_cidr_block         = var.vpc_cidr_east
   transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_attachment.east[0].id
-  transit_gateway_route_table_id = module.vpc-ns-inspection.inspection_tgw_route_table_id
+  transit_gateway_route_table_id = module.vpc-inspection.inspection_tgw_route_table_id
 }
 resource "aws_ec2_transit_gateway_route" "east-default-route-to-inspection-tgw" {
   count                          = var.create_tgw_routes_for_existing? 1 : 0
-  depends_on                     = [module.vpc-ns-inspection]
+  depends_on                     = [module.vpc-inspection]
   destination_cidr_block         = "0.0.0.0/0"
-  transit_gateway_attachment_id  = module.vpc-ns-inspection.inspection_tgw_attachment_id
+  transit_gateway_attachment_id  = module.vpc-inspection.inspection_tgw_attachment_id
   transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.east-tgw-rtb[0].id
 }
 resource "aws_ec2_transit_gateway_route" "west-default-route-to-inspection-tgw" {
   count                          = var.create_tgw_routes_for_existing? 1 : 0
-  depends_on                     = [module.vpc-ns-inspection]
+  depends_on                     = [module.vpc-inspection]
   destination_cidr_block         = "0.0.0.0/0"
-  transit_gateway_attachment_id  = module.vpc-ns-inspection.inspection_tgw_attachment_id
+  transit_gateway_attachment_id  = module.vpc-inspection.inspection_tgw_attachment_id
   transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.west-tgw-rtb[0].id
 }

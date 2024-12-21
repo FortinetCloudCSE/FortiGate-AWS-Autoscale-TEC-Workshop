@@ -34,7 +34,7 @@ fortigate_asg_password      = ""
 # nat_gw will create a NAT Gateway in the public subnet of the inspection VPC and point the route tables to the NAT Gateway
 # eip will assign an Elastic IP to the Fortigate instances in the autoscale group and point the route tables to the IGW
 #
-access_internet_mode = "eip"
+access_internet_mode = "nat_gw"
 
 #
 # defines how many interfaces the firewall will have. 2-arm is a public interface and a private interface.
@@ -54,7 +54,7 @@ enable_dedicated_management_vpc = false
 # allow the creation of a dedicated managment subnet in the inspection VPC. Then create a dedicated management
 # ENI in the management subnet.
 #
-enable_dedicated_management_eni  = false
+enable_dedicated_management_eni  = true
 
 #
 # allow inspection of traffic between spoke vpcs
@@ -90,12 +90,12 @@ subnet_bits                 = 7
 # All resources deployed in the North-South VPC will have the prefix "ns"
 # All resources deployed in the East-West VPC will have the prefix "ew"
 # These values can be anything you like, but they must be unique or you will encounter resource naming conflicts.
-ns_module_prefix            = "ns"
+asg_module_prefix            = "asg"
 
 #
 # directory where BYOL Licenses for NS firewall group are stored
 #
-ns_license_directory        = "ns_license"
+asg_license_directory        = "asg_license"
 #
 # base fortios configuration file. These files are in the base directory and prefixes are added depending on
 # the configuration being deployed. e.g. 1-arm-wdm-fgt-conf.cfg, 2-arm-fgt-conf.cfg
@@ -108,13 +108,13 @@ base_config_file            = "fgt-conf.cfg"
 # To increase the number of instances in the ASG,
 # change the values in the autoscale group through the GUI to desired values after the stack is created.
 #
-ns_byol_asg_min_size         = 1
-ns_byol_asg_max_size         = 2
-ns_byol_asg_desired_size     = 1
+asg_byol_asg_min_size         = 1
+asg_byol_asg_max_size         = 2
+asg_byol_asg_desired_size     = 1
 
-ns_ondemand_asg_min_size     = 0
-ns_ondemand_asg_max_size     = 2
-ns_ondemand_asg_desired_size = 0
+asg_ondemand_asg_min_size     = 0
+asg_ondemand_asg_max_size     = 2
+asg_ondemand_asg_desired_size = 0
 
 #
 # Fortigate Autoscale Variables
@@ -125,7 +125,7 @@ fgt_instance_type           = "c7gn.xlarge"
 #
 # Fortigate version used by all of the ASGs. If you only put the major version, it will use the latest minor version.
 #
-fortios_version             = "7.4.4"
+fortios_version             = "7.4.5"
 
 #
 # Port the fortigate UI is listening on. Default is 443. Some like to move it to 8443
@@ -136,13 +136,13 @@ fortigate_gui_port   = 443
 # Endpoint names for the inspection VPCs. These are used to setup the route tables for the inspection VPCs.
 # For now, the autoscale templates deploy the endpoints, but do not pass the endpoint ids back the main template.
 # So, the main templates have to lookup the endpoint ids by name for route table manipulations.
-ns_endpoint_name_az1            = "ns-gwlbe_az1"
-ns_endpoint_name_az2            = "ns-gwlbe_az2"
+endpoint_name_az1               = "asg-gwlbe_az1"
+endpoint_name_az2               = "asg-gwlbe_az2"
 
 #
 # CIDR blocks for the inspection VPCs
 #
-vpc_cidr_ns_inspection      = "10.0.0.0/16"
+vpc_cidr_inspection         = "10.0.0.0/16"
 vpc_cidr_management         = "10.3.0.0/16"
 
 #

@@ -60,10 +60,6 @@ variable "enable_dedicated_management_eni" {
   description = "Boolean to allow creation of dedicated management subnets and ENI in the inspection VPC"
   type        = bool
 }
-variable "enable_nat_gateway" {
-  description = "Boolean to allow creation of nat_gw subnets and route tables in the inspection VPC"
-  type        = bool
-}
 variable "create_tgw_routes_for_existing" {
   description = "Boolean to allow creation of TGW routes for the existing_vpc_resources template"
   type        = bool
@@ -80,12 +76,12 @@ variable "allow_cross_zone_load_balancing" {
   description = "Allow gateway load balancer to use healthy instances in a different zone"
   type        = bool
 }
-variable "ns_module_prefix" {
+variable "asg_module_prefix" {
   description = "Module Prefix for East/West Autoscale Group"
   type        = string
   default     = ""
 }
-variable "vpc_cidr_ns_inspection" {
+variable "vpc_cidr_inspection" {
     description = "CIDR for the whole NS inspection VPC"
 }
 variable "vpc_cidr_east" {
@@ -105,12 +101,12 @@ variable "attach_to_tgw_name" {
   type        = string
   default     = ""
 }
-variable "ns_endpoint_name_az1" {
+variable "endpoint_name_az1" {
   description = "Name of the gwlb endpoint to route to in AZ1"
   type        = string
   default     = ""
 }
-variable "ns_endpoint_name_az2" {
+variable "endpoint_name_az2" {
   description = "Name of the gwlb endpoint to route to in AZ2"
   type        = string
   default     = ""
@@ -128,7 +124,7 @@ variable "fortios_version" {
 variable "fortigate_asg_password" {
   description = "Password for the Fortigate ASG"
 }
-variable "ns_license_directory" {
+variable "asg_license_directory" {
   description = "License Directory for North/South Autoscale Group"
   type        = string
   default     = ""
@@ -139,27 +135,27 @@ variable "base_config_file" {
   type        = string
   default     = ""
 }
-variable "ns_byol_asg_min_size" {
+variable "asg_byol_asg_min_size" {
     description = "Minimum size for the BYOL ASG"
     type        = number
 }
-variable "ns_byol_asg_max_size" {
+variable "asg_byol_asg_max_size" {
     description = "Maximum size for the BYOL ASG"
     type        = number
 }
-variable "ns_byol_asg_desired_size" {
+variable "asg_byol_asg_desired_size" {
     description = "Desired size for the BYOL ASG"
     type        = number
 }
-variable "ns_ondemand_asg_min_size" {
+variable "asg_ondemand_asg_min_size" {
     description = "Minimum size for the On Demand ASG"
     type        = number
 }
-variable "ns_ondemand_asg_max_size" {
+variable "asg_ondemand_asg_max_size" {
     description = "Maximum size for the OnDemand ASG"
     type        = number
 }
-variable "ns_ondemand_asg_desired_size" {
+variable "asg_ondemand_asg_desired_size" {
     description = "Desired size for the OnDemand ASG"
     type        = number
 }

@@ -56,7 +56,7 @@ data "aws_subnet" "public_subnet_az2" {
   }
 }
 data "aws_subnet" "management_subnet_az1" {
-  depends_on = [module.vpc-ns-inspection]
+  depends_on = [module.vpc-inspection]
   count = var.enable_dedicated_management_eni ? 1 : 0
   filter {
     name   = "tag:Name"
@@ -68,7 +68,7 @@ data "aws_subnet" "management_subnet_az1" {
   }
 }
 data "aws_subnet" "management_subnet_az2" {
-  depends_on = [module.vpc-ns-inspection]
+  depends_on = [module.vpc-inspection]
   count = var.enable_dedicated_management_eni ? 1 : 0
   filter {
     name   = "tag:Name"
@@ -82,7 +82,7 @@ data "aws_subnet" "management_subnet_az2" {
 resource "aws_security_group" "management-vpc-sg" {
   count = var.enable_dedicated_management_vpc || var.enable_dedicated_management_eni ? 1 : 0
   description = "Security Group for ENI in the management VPC"
-  vpc_id = var.enable_dedicated_management_vpc ? data.aws_vpc.management_vpc[0].id : module.vpc-ns-inspection.vpc_id
+  vpc_id = var.enable_dedicated_management_vpc ? data.aws_vpc.management_vpc[0].id : module.vpc-inspection.vpc_id
   ingress {
     description = "Allow egress ALL"
     from_port = 0
@@ -108,38 +108,38 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
   ## Root config
   region     = var.aws_region
 
-  module_prefix = var.ns_module_prefix
+  module_prefix = var.asg_module_prefix
   existing_security_vpc = {
-    id = module.vpc-ns-inspection.vpc_id
+    id = module.vpc-inspection.vpc_id
   }
   existing_igw = {
-    id = module.vpc-ns-inspection.igw_id
+    id = module.vpc-inspection.igw_id
   }
   existing_tgw = {
   }
   existing_subnets = {
     fgt_login_az1 = {
-      id = module.vpc-ns-inspection.subnet_public_az1_id
+      id = module.vpc-inspection.subnet_public_az1_id
       availability_zone = local.availability_zone_1
     },
     fgt_login_az2 = {
-      id = module.vpc-ns-inspection.subnet_public_az2_id
+      id = module.vpc-inspection.subnet_public_az2_id
       availability_zone = local.availability_zone_2
     },
     gwlbe_az1 = {
-      id = module.vpc-ns-inspection.subnet_gwlbe_az1_id
+      id = module.vpc-inspection.subnet_gwlbe_az1_id
       availability_zone = local.availability_zone_1
     },
     gwlbe_az2 = {
-     id = module.vpc-ns-inspection.subnet_gwlbe_az2_id
+     id = module.vpc-inspection.subnet_gwlbe_az2_id
       availability_zone = local.availability_zone_2
     },
     fgt_internal_az1 = {
-      id = module.vpc-ns-inspection.subnet_private_az1_id
+      id = module.vpc-inspection.subnet_private_az1_id
       availability_zone = local.availability_zone_1
     },
     fgt_internal_az2 = {
-      id = module.vpc-ns-inspection.subnet_private_az2_id
+      id = module.vpc-inspection.subnet_private_az2_id
       availability_zone = local.availability_zone_2
     }
   }
@@ -186,7 +186,7 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
     }
   }
 
-  vpc_cidr_block     = var.vpc_cidr_ns_inspection
+  vpc_cidr_block     = var.vpc_cidr_inspection
 # spoke_cidr_list    = [var.vpc_cidr_east, var.vpc_cidr_west]
   spoke_cidr_list    = [ ]
   availability_zones = [local.availability_zone_1, local.availability_zone_2]
@@ -228,7 +228,7 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
       instance_type   = var.fgt_instance_type
       fgt_password    = var.fortigate_asg_password
       keypair_name    = var.keypair
-      lic_folder_path = var.ns_license_directory
+      lic_folder_path = var.asg_license_directory
       # fortiflex_refresh_token = "<YOUR-OWN-VALUE>" # e.g. "NasmPa0CXpd56n6TzJjGqpqZm9Thyw"
       # fortiflex_sn_list = "<YOUR-OWN-VALUE>" # e.g. ["FGVMMLTM00000001", "FGVMMLTM00000002"]
       # fortiflex_configid_list = "<YOUR-OWN-VALUE>" # e.g. [2343]
@@ -243,9 +243,9 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
       # user_conf_content : FortiGate Configuration
       # user_conf_file_path : The file path of configuration file
       # user_conf_s3 : Map of AWS S3
-      asg_max_size          = var.ns_byol_asg_max_size
-      asg_min_size          = var.ns_byol_asg_min_size
-      asg_desired_capacity  = var.ns_byol_asg_desired_size
+      asg_max_size          = var.asg_byol_asg_max_size
+      asg_min_size          = var.asg_byol_asg_min_size
+      asg_desired_capacity  = var.asg_byol_asg_desired_size
       create_dynamodb_table = true
       dynamodb_table_name   = "fgt_asg_track_table"
     },
@@ -287,9 +287,9 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
       # user_conf_content : FortiGate Configuration
       # user_conf_file_path : The file path of configuration file
       # user_conf_s3 : Map of AWS S3
-      asg_max_size          = var.ns_ondemand_asg_max_size
-      asg_min_size          = var.ns_ondemand_asg_min_size
-      asg_desired_capacity  = var.ns_ondemand_asg_desired_size
+      asg_max_size          = var.asg_ondemand_asg_max_size
+      asg_min_size          = var.asg_ondemand_asg_min_size
+      asg_desired_capacity  = var.asg_ondemand_asg_desired_size
       asg_max_size = 2
       asg_min_size = 0
       # asg_desired_capacity = 0
