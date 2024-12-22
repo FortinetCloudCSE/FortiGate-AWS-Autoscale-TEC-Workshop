@@ -72,7 +72,7 @@ attach_to_tgw_name              = "acme-test-tgw"
 #
 # Only set create_tgw_routes_for_existing to true if you created the existing_vp_resources template.
 #
-create_tgw_routes_for_existing  = true
+create_tgw_routes_for_existing  = false
 
 #
 # Allow the GWLB to load balance to healthy FortiGate instances in a different zone
@@ -83,7 +83,7 @@ allow_cross_zone_load_balancing = true
 # Subnet bits = number of bits used in the cidr for subnet.
 # e.g. 10.0.0.0/16 cidr with 8 subnet bits means each subnet is 10.0.0.0/24, 10.0.1.0/24, etc
 #
-subnet_bits                 = 7
+subnet_bits                 = 8
 
 #
 # Prefixes for resources deployed in the North-South and East-West VPCs
