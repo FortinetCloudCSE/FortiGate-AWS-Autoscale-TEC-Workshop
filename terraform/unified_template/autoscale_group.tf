@@ -290,8 +290,6 @@ module "spk_tgw_gwlb_asg_fgt_igw" {
       asg_max_size          = var.asg_ondemand_asg_max_size
       asg_min_size          = var.asg_ondemand_asg_min_size
       asg_desired_capacity  = var.asg_ondemand_asg_desired_size
-      asg_max_size = 2
-      asg_min_size = 0
       # asg_desired_capacity = 0
       dynamodb_table_name = "fgt_asg_track_table"
       scale_policies = {
