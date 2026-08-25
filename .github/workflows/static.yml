@@ -80,10 +80,9 @@ jobs:
               break
             fi
 
-            status=$?
             if [ "$attempt" -ge "$MAX_ATTEMPTS" ]; then
-              echo "Pull failed after $MAX_ATTEMPTS attempts"
-              exit $status
+              echo "::error::Failed to pull $IMAGE after $MAX_ATTEMPTS attempts"
+              exit 1
             fi
 
             # Exponential backoff with jitter: (2^attempt) + random(0..3)
@@ -98,16 +97,33 @@ jobs:
           docker tag "$IMAGE" "$LOCAL_IMAGE"
 
       - name: Build static app
+        shell: bash
         run: |
-         CONT_ID=$(docker run -d -v ${{github.workspace}}:/home/UserRepo "$LOCAL_IMAGE" build)
-         docker wait "$CONT_ID"
-         rm -rf ${{github.workspace}}/docs
-         docker cp $CONT_ID:/home/CentralRepo/public ${{github.workspace}}/docs
-         docker stop $CONT_ID
-         docker rm $CONT_ID
+          CONT_ID=$(docker run -d -v "${{ github.workspace }}:/home/UserRepo" "$LOCAL_IMAGE" build)
+
+          cleanup() {
+            docker rm -f "$CONT_ID" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          STATUS=$(docker wait "$CONT_ID")
+          docker logs "$CONT_ID"
+
+          if [ "$STATUS" -ne 0 ]; then
+            echo "::error::Static site build failed with exit code $STATUS"
+            exit "$STATUS"
+          fi
+
+          rm -rf "${{ github.workspace }}/docs"
+          docker cp "$CONT_ID:/home/CentralRepo/public" "${{ github.workspace }}/docs"
 
       - name: Remove images
-        run: docker rmi -f $(docker images "$IMAGE_REPO" -aq)
+        shell: bash
+        run: |
+          IMAGES=$(docker images "$IMAGE_REPO" -aq)
+          if [ -n "$IMAGES" ]; then
+            docker rmi -f $IMAGES
+          fi
 
       - name: Clear Docker cache
         run: docker builder prune -f
@@ -118,6 +134,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
+          # Upload the generated static site
           path: './docs'
 
       - name: Deploy to GitHub Pages
